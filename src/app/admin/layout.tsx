@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { FaTachometerAlt, FaNewspaper, FaSignOutAlt, FaPlus, FaList, FaImage, FaLink, FaGift } from 'react-icons/fa';
+import { FaTachometerAlt, FaSignOutAlt, FaPlus, FaList, FaImage, FaLink, FaGift } from 'react-icons/fa';
 import './admin.scss';
 
 export default function AdminLayout({
@@ -12,7 +12,6 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Kiểm tra trạng thái đăng nhập khi component được mount

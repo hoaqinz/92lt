@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import styles from './editor.module.scss';
 
@@ -13,7 +12,6 @@ const categories = [
 ];
 
 export default function NewPost() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     title: '',
     excerpt: '',
