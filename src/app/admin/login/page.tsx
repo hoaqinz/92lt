@@ -19,7 +19,7 @@ export default function AdminLogin() {
     try {
       // Trong môi trường thực tế, bạn sẽ gọi API để xác thực
       // Đây là mô phỏng xác thực đơn giản
-      if (username === 'admin' && password === 'admin123') {
+      if (username === 'admin92lottery' && password === 'secure_password_123') {
         // Lưu trạng thái đăng nhập vào localStorage
         const authData = JSON.stringify({
           isLoggedIn: true,
