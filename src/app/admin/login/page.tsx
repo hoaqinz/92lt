@@ -1,77 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import styles from './login.module.scss';
 
 export default function AdminLogin() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  // Hàm xử lý đăng nhập
+  const handleLogin = () => {
+    const username = (document.getElementById('username') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+    const errorElement = document.getElementById('error-message');
 
-  // Đánh dấu khi component được mount ở client-side
-  useEffect(() => {
-    setIsClient(true);
+    if (username === 'admin92lottery' && password === 'secure_password_123') {
+      // Lưu trạng thái đăng nhập vào localStorage
+      const authData = JSON.stringify({
+        isLoggedIn: true,
+        username: username,
+        timestamp: new Date().getTime()
+      });
 
-    // Kiểm tra nếu đã đăng nhập thì chuyển hướng đến dashboard
-    if (typeof window !== 'undefined') {
-      const authData = localStorage.getItem('adminAuth');
-      if (authData) {
-        try {
-          const parsedData = JSON.parse(authData);
-          const { isLoggedIn, timestamp } = parsedData;
-          const now = new Date().getTime();
-          const expirationTime = 24 * 60 * 60 * 1000; // 24 giờ
+      localStorage.setItem('adminAuth', authData);
 
-          if (isLoggedIn && now - timestamp < expirationTime) {
-            window.location.href = '/admin/dashboard';
-          }
-        } catch (err) {
-          console.error('Error parsing auth data:', err);
-        }
+      // Thiết lập cookie
+      document.cookie = `adminAuth=${authData}; path=/; max-age=${24 * 60 * 60}`;
+
+      // Chuyển hướng đến trang admin
+      window.location.href = '/admin/dashboard';
+    } else {
+      if (errorElement) {
+        errorElement.textContent = 'Tên đăng nhập hoặc mật khẩu không đúng';
+        errorElement.style.display = 'block';
       }
     }
-  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    try {
-      // Trong môi trường thực tế, bạn sẽ gọi API để xác thực
-      // Đây là mô phỏng xác thực đơn giản
-      if (username === 'admin92lottery' && password === 'secure_password_123') {
-        // Lưu trạng thái đăng nhập vào localStorage
-        const authData = JSON.stringify({
-          isLoggedIn: true,
-          username: username,
-          timestamp: new Date().getTime()
-        });
-
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('adminAuth', authData);
-
-          // Thiết lập cookie cho middleware
-          document.cookie = `adminAuth=${authData}; path=/; max-age=${24 * 60 * 60}`;
-
-          console.log('Login successful, redirecting...');
-
-          // Chuyển hướng đến trang admin sau một khoảng thời gian ngắn
-          setTimeout(() => {
-            window.location.href = '/admin/dashboard';
-          }, 500);
-        }
-      } else {
-        setError('Tên đăng nhập hoặc mật khẩu không đúng');
-      }
-    } catch (err) {
-      setError('Đã xảy ra lỗi khi đăng nhập');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    return false;
   };
 
   return (
@@ -82,16 +42,14 @@ export default function AdminLogin() {
           <h2>Đăng nhập Admin</h2>
         </div>
 
-        {error && <div className={styles.errorMessage}>{error}</div>}
+        <div id="error-message" className={styles.errorMessage} style={{display: 'none'}}></div>
 
-        <form onSubmit={handleSubmit} className={styles.loginForm}>
+        <div className={styles.loginForm}>
           <div className={styles.formGroup}>
             <label htmlFor="username">Tên đăng nhập</label>
             <input
               type="text"
               id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
               required
               autoComplete="username"
             />
@@ -102,21 +60,18 @@ export default function AdminLogin() {
             <input
               type="password"
               id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
             />
           </div>
 
           <button
-            type="submit"
             className={styles.loginButton}
-            disabled={loading}
+            onClick={handleLogin}
           >
-            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            Đăng nhập
           </button>
-        </form>
+        </div>
 
         <div className={styles.loginFooter}>
           <p>© 2023 92LOTTERY Admin Panel</p>
