@@ -1,10 +1,12 @@
 #!/bin/bash
 
-# Xóa package-lock.json nếu tồn tại
-rm -f package-lock.json
+# Cài đặt dependencies với npm install thay vì npm ci
+export CI=false
+export NPM_CONFIG_LEGACY_PEER_DEPS=true
+export NPM_CONFIG_FORCE=true
 
-# Cài đặt dependencies với --force
-npm install --force
+# Cài đặt dependencies
+npm install --force --legacy-peer-deps
 
 # Build dự án
 npm run build
