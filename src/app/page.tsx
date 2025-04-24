@@ -1,103 +1,92 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Banner from './components/ui/Banner';
+import TabContent from './components/ui/TabContent';
+import PromotionSection from './components/ui/PromotionSection';
+import BlogSection from './components/ui/BlogSection';
+import styles from './page.module.scss';
+
+// Mock data for banners
+const bannerData = [
+  {
+    title: 'Chào mừng đến 92LOTTERY',
+    description: 'Đăng ký ngay và nhận 100% tiền thưởng lên đến 500$ + 200 lượt quay miễn phí',
+    buttonText: 'Nhận thưởng',
+    image: 'https://via.placeholder.com/1920x500/1a1a1a/ff0000?text=92LOTTERY+Welcome+Bonus',
+  },
+  {
+    title: 'Cược thể thao',
+    description: 'Đặt cược với tỷ lệ tốt nhất và nhận cược miễn phí lên đến 50$',
+    buttonText: 'Đặt cược ngay',
+    image: 'https://via.placeholder.com/1920x500/1a1a1a/ffcc00?text=92LOTTERY+Sports+Betting',
+  },
+  {
+    title: 'Casino trực tuyến',
+    description: 'Trải nghiệm cảm giác hấp dẫn với các trò chơi casino thật với dealer chuyên nghiệp',
+    buttonText: 'Chơi ngay',
+    image: 'https://via.placeholder.com/1920x500/1a1a1a/00ff00?text=92LOTTERY+Live+Casino',
+  },
+];
+
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [activeTab, setActiveTab] = useState('lottery');
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const tabs = [
+    { id: 'lottery', name: 'Xổ số', description: 'Trải nghiệm các trò chơi xổ số hấp dẫn với cơ hội trúng thưởng lớn.' },
+    { id: 'slots', name: 'Slots', description: 'Khám phá thế giới slots đa dạng từ các nhà cung cấp game hàng đầu.' },
+    { id: 'sports', name: 'Thể thao', description: 'Đặt cược vào các sự kiện thể thao với tỷ lệ cược hấp dẫn nhất.' },
+    { id: 'casino', name: 'Casino', description: 'Trải nghiệm không khí casino thực tế với các trò chơi đẳng cấp.' },
+    { id: 'card-games', name: 'Game bài', description: 'Thử vận may với các trò chơi bài phổ biến và hấp dẫn.' },
+    { id: 'fishing', name: 'Bắn cá', description: 'Tham gia săn cá và nhận thưởng lớn với các trò chơi bắn cá hấp dẫn.' },
+    { id: 'mini-games', name: 'Mini game', description: 'Giải trí với các mini game đơn giản nhưng không kém phần thú vị.' },
+    { id: 'popular', name: 'Phổ biến', description: 'Những trò chơi được yêu thích nhất tại 92LOTTERY.' }
+  ];
+
+  return (
+    <div className={styles.homePage}>
+      <Banner banners={bannerData} />
+
+      <div className="container">
+        <section className={styles.gamesSection}>
+          <div className={styles.tabsContainer}>
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                className={`${styles.tabButton} ${activeTab === tab.id ? styles.active : ''}`}
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.name}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.tabContent}>
+            <h2 className="section-title">{tabs.find(tab => tab.id === activeTab)?.name}</h2>
+            <p className={styles.sectionDescription}>
+              {tabs.find(tab => tab.id === activeTab)?.description}
+            </p>
+            <TabContent activeTab={activeTab} />
+          </div>
+        </section>
+
+        <PromotionSection />
+
+        <section className={styles.blogSection}>
+          <BlogSection />
+        </section>
+
+        <section className={styles.aboutSection}>
+          <h2 className="section-title">Về 92LOTTERY</h2>
+          <div className={styles.aboutContent}>
+            <p>92LOTTERY là nền tảng casino trực tuyến và cược thể thao hàng đầu cung cấp nhiều loại trò chơi và lựa chọn cược đa dạng. Với giao diện thân thiện, phương thức thanh toán an toàn và hỗ trợ khách hàng 24/7, 92LOTTERY mang đến trải nghiệm chơi game tuyệt vời cho người chơi trên toàn thế giới.</p>
+            <p>Nền tảng của chúng tôi có hàng trăm trò chơi casino từ các nhà cung cấp hàng đầu, tỷ lệ cạnh tranh cho cược thể thao và nhiều khuyến mãi hấp dẫn. Tham gia 92LOTTERY ngay hôm nay và trải nghiệm cảm giác hấp dẫn của trò chơi trực tuyến ở mức tốt nhất.</p>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

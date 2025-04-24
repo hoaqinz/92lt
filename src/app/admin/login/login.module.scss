@@ -1,0 +1,118 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  padding: 1rem;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 400px;
+  background-color: #121212;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  border: 1px solid rgba(255, 0, 0, 0.2);
+}
+
+.loginHeader {
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.8) 0%, rgba(255, 0, 0, 0.6) 100%);
+  
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.loginForm {
+  padding: 2rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: rgba(255, 0, 0, 0.5);
+      box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+    }
+  }
+}
+
+.loginButton {
+  width: 100%;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+  }
+  
+  &:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.errorMessage {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  color: #ff6666;
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin: 0 2rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.loginFooter {
+  padding: 1rem;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  
+  p {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}

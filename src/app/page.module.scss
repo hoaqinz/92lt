@@ -1,0 +1,855 @@
+.homePage {
+  padding-bottom: 3rem;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 62, 62, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+.gamesSection, .promotionsSection, .blogSection, .aboutSection {
+  margin: 0.8rem 0;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: -0.5rem;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  }
+}
+
+.sectionDescription {
+  color: var(--light-color);
+  opacity: 0.8;
+  margin-bottom: var(--spacing-xs);
+  max-width: 800px;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  position: relative;
+
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(to right, var(--primary-color), transparent);
+    opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    margin-bottom: calc(var(--spacing-xs) * 0.7);
+  }
+}
+
+.tabsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  position: relative;
+  overflow-x: auto;
+  padding-bottom: var(--spacing-sm);
+  justify-content: center;
+
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  }
+
+  &::-webkit-scrollbar {
+    height: 3px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 3px;
+  }
+
+  @media (max-width: 768px) {
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-bottom: var(--spacing-sm);
+    justify-content: flex-start;
+    padding-bottom: var(--spacing-xs);
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.tabButton {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: rgba(30, 30, 30, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--border-radius-md);
+  color: var(--light-color);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s var(--transition-smooth);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: all 0.6s var(--transition-smooth);
+  }
+
+  &:hover {
+    background-color: rgba(40, 40, 40, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+
+    &:before {
+      left: 100%;
+    }
+  }
+
+  &.active {
+    background-color: rgba(255, 0, 0, 0.2);
+    border-color: rgba(255, 0, 0, 0.4);
+    color: var(--primary-color);
+    box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2), inset 0 0 10px rgba(255, 0, 0, 0.1);
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+    animation: pulse 2s infinite, glow 3s infinite;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-image: var(--primary-gradient);
+      box-shadow: 0 0 8px var(--glow-color);
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 0, 0, 0.25), inset 0 0 15px rgba(255, 0, 0, 0.15);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+}
+
+.tabContent {
+  position: relative;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.7), 0 0 15px rgba(255, 0, 0, 0.5);
+  }
+  100% {
+    text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  }
+}
+
+.promotionsSection {
+  margin: 3rem 0;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 0, 0, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+.promotionCards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (min-width: 992px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.promotionCardHorizontal {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  transition: all 0.4s var(--transition-smooth);
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  display: flex;
+  flex-direction: row;
+  height: 200px;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.15) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s var(--transition-smooth);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.1) 0%, transparent 5%, transparent 95%, rgba(255, 255, 255, 0.1) 100%);
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.4s var(--transition-smooth);
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl), 0 15px 30px rgba(255, 0, 0, 0.25);
+    background-color: var(--card-bg-hover);
+    border-color: rgba(255, 0, 0, 0.3);
+
+    &:before {
+      opacity: 1;
+    }
+
+    &:after {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: auto;
+  }
+}
+
+.promotionCard {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  transition: all 0.4s var(--transition-smooth);
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.15) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s var(--transition-smooth);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.1) 0%, transparent 5%, transparent 95%, rgba(255, 255, 255, 0.1) 100%);
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.4s var(--transition-smooth);
+  }
+
+  &:hover {
+    transform: translateY(-10px) rotateX(2deg);
+    box-shadow: var(--shadow-xl), 0 15px 30px rgba(255, 0, 0, 0.25);
+    background-color: var(--card-bg-hover);
+    border-color: rgba(255, 0, 0, 0.3);
+
+    &:before {
+      opacity: 1;
+    }
+
+    &:after {
+      opacity: 1;
+    }
+  }
+}
+
+.promotionImageWrapper {
+  position: relative;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: all 0.8s var(--transition-smooth);
+    position: relative;
+    z-index: 0;
+    filter: brightness(0.9);
+  }
+
+  .promotionOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.8) 100%);
+    z-index: 1;
+  }
+
+  .promotionCard:hover &, .promotionCardHorizontal:hover & {
+    img {
+      transform: scale(1.05) translateZ(10px);
+      filter: brightness(1.1) contrast(1.1);
+    }
+  }
+
+  .promotionCardHorizontal & {
+    flex: 0 0 300px;
+
+    @media (max-width: 768px) {
+      flex: 1;
+      height: 180px;
+
+      img {
+        height: 180px;
+      }
+    }
+  }
+}
+
+.promotionBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-image: var(--primary-gradient);
+  color: white;
+  font-weight: 700;
+  padding: 0.4rem 1rem;
+  border-radius: var(--border-radius-xl);
+  font-size: 0.8rem;
+  z-index: 10;
+  box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+  letter-spacing: 1px;
+  transform: translateZ(20px) rotate(3deg);
+  transition: all 0.3s var(--transition-smooth);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 2s infinite;
+  }
+
+  .promotionCard:hover & {
+    transform: translateZ(30px) rotate(0deg) scale(1.1);
+    box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.promotionContent {
+  padding: 1.8rem;
+  position: relative;
+  z-index: 3;
+  background: linear-gradient(to bottom, rgba(18, 18, 18, 0.8), var(--card-bg));
+  transform: translateZ(5px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+  }
+
+  .promotionIcon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 0 5px var(--glow-color));
+    transition: all 0.3s var(--transition-smooth);
+
+    .promotionCard:hover &, .promotionCardHorizontal:hover & {
+      transform: scale(1.2) rotate(5deg);
+    }
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    transition: all 0.3s var(--transition-smooth);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background-image: var(--primary-gradient);
+      border-radius: 2px;
+      transition: all 0.3s var(--transition-smooth);
+      box-shadow: 0 0 8px var(--glow-color);
+    }
+
+    .promotionCard:hover &:after, .promotionCardHorizontal:hover &:after {
+      width: 100%;
+      height: 3px;
+    }
+
+    .promotionCard:hover &, .promotionCardHorizontal:hover & {
+      color: var(--primary-color);
+      text-shadow: 0 0 10px var(--glow-color);
+      transform: translateZ(5px);
+    }
+
+    .promotionCardHorizontal & {
+      font-size: 1.3rem;
+    }
+  }
+
+  p {
+    margin-bottom: 1.8rem;
+    color: white;
+    opacity: 0.8;
+    line-height: 1.6;
+    transition: all 0.3s var(--transition-smooth);
+    font-size: 1rem;
+    flex: 1;
+
+    .promotionCard:hover &, .promotionCardHorizontal:hover & {
+      opacity: 1;
+      transform: translateZ(5px);
+    }
+
+    .promotionCardHorizontal & {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s var(--transition-smooth);
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    align-self: flex-start;
+
+    span {
+      display: inline-block;
+      margin-left: 0.5rem;
+      transition: transform 0.3s var(--transition-smooth);
+    }
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: all 0.6s var(--transition-smooth);
+    }
+
+    .promotionCard:hover &, .promotionCardHorizontal:hover & {
+      transform: translateZ(10px);
+      box-shadow: 0 8px 20px rgba(255, 0, 0, 0.3);
+
+      &:before {
+        left: 100%;
+      }
+
+      span {
+        transform: translateX(3px);
+      }
+    }
+
+    .promotionCardHorizontal & {
+      padding: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  .promotionCardHorizontal & {
+    padding: 1.5rem;
+    background: var(--card-bg);
+
+    @media (max-width: 768px) {
+      padding: 1.2rem;
+    }
+  }
+}
+
+.promotionCardNew {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  transition: all 0.4s var(--transition-smooth);
+  position: relative;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl), 0 10px 20px rgba(255, 0, 0, 0.2);
+    border-color: rgba(255, 0, 0, 0.3);
+
+    .promotionImageNew img {
+      transform: scale(1.05);
+      filter: brightness(1.1) contrast(1.1);
+    }
+
+    .promotionBadgeNew {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+    }
+
+    .promotionIconNew {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .promotionContentNew h3 {
+      color: var(--primary-color);
+      text-shadow: 0 0 8px var(--glow-color);
+    }
+
+    .promotionContentNew h3:after {
+      width: 80%;
+      height: 2px;
+    }
+
+    .promotionContentNew button {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2);
+
+      span {
+        transform: translateX(2px);
+      }
+    }
+  }
+}
+
+.promotionImageNew {
+  position: relative;
+  overflow: hidden;
+  height: 140px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.8s var(--transition-smooth);
+    filter: brightness(0.9);
+  }
+
+  .promotionOverlayNew {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 30%, rgba(0, 0, 0, 0.8) 100%);
+    z-index: 1;
+  }
+}
+
+.promotionBadgeNew {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  background-image: var(--primary-gradient);
+  color: white;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--border-radius-xl);
+  font-size: 0.7rem;
+  z-index: 10;
+  box-shadow: 0 3px 10px rgba(255, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+  transform: translateY(0);
+  transition: all 0.3s var(--transition-smooth);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.promotionContentNew {
+  padding: 1rem;
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
+  .promotionIconNew {
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+    filter: drop-shadow(0 0 5px var(--glow-color));
+    transition: all 0.3s var(--transition-smooth);
+  }
+
+  h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    transition: all 0.3s var(--transition-smooth);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background-image: var(--primary-gradient);
+      border-radius: 2px;
+      transition: all 0.3s var(--transition-smooth);
+      box-shadow: 0 0 8px var(--glow-color);
+    }
+  }
+
+  p {
+    margin-bottom: 1rem;
+    color: white;
+    opacity: 0.8;
+    line-height: 1.4;
+    transition: all 0.3s var(--transition-smooth);
+    font-size: 0.8rem;
+    flex: 1;
+  }
+
+  button {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s var(--transition-smooth);
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    align-self: flex-start;
+    font-size: 0.75rem;
+
+    span {
+      display: inline-block;
+      margin-left: 0.3rem;
+      transition: transform 0.3s var(--transition-smooth);
+    }
+  }
+}
+
+.viewAllPromotions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.viewAllLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  border-radius: var(--border-radius-md);
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s var(--transition-smooth);
+  text-decoration: none;
+
+  span {
+    display: inline-block;
+    margin-left: 0.4rem;
+    transition: transform 0.3s var(--transition-smooth);
+  }
+
+  &:hover {
+    background-color: rgba(255, 0, 0, 0.2);
+    box-shadow: 0 3px 10px rgba(255, 0, 0, 0.15);
+    transform: translateY(-2px);
+
+    span {
+      transform: translateX(2px);
+    }
+  }
+}
+
+.aboutContent {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--border-radius-lg);
+  position: relative;
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 10% 10%, rgba(255, 62, 62, 0.05) 0%, transparent 50%);
+    z-index: 0;
+  }
+
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255, 62, 62, 0.03) 0%, transparent 70%);
+    z-index: 0;
+  }
+
+  p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    color: white;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s var(--transition-smooth);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &:hover {
+      opacity: 1;
+      transform: translateX(5px);
+    }
+  }
+}

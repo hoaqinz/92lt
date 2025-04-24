@@ -1,0 +1,96 @@
+.gameIconsContainer {
+  margin: var(--spacing-lg) 0;
+}
+
+.gameIconsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.gameIconItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--light-color);
+  transition: all 0.3s var(--transition-bounce);
+  
+  &:hover {
+    transform: translateY(-5px);
+    
+    .gameIconImage {
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 0 15px var(--glow-color);
+      
+      img {
+        transform: scale(1.1);
+      }
+    }
+    
+    .gameIconTitle {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.gameIconImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-sm);
+  background-color: var(--dark-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    transition: transform 0.3s ease;
+  }
+}
+
+.gameIconTitle {
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .gameIconsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: var(--spacing-sm);
+  }
+  
+  .gameIconImage {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+  }
+  
+  .gameIconTitle {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .gameIconsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: var(--spacing-xs);
+  }
+  
+  .gameIconImage {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+  }
+  
+  .gameIconTitle {
+    font-size: 0.7rem;
+  }
+}
