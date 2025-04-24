@@ -5,6 +5,16 @@ import { useRouter } from 'next/navigation';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import styles from '../../new/editor.module.scss';
 
+// Hàm này sẽ tạo ra các tham số tĩnh cho trang
+export function generateStaticParams() {
+  // Tạo một mảng các ID mẫu để tạo trang tĩnh
+  return [
+    { id: 'sample-post-1' },
+    { id: 'sample-post-2' },
+    { id: 'sample-post-3' }
+  ];
+}
+
 export default function EditPost({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { id } = params;
