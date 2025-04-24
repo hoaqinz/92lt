@@ -1,224 +1,213 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaSave, FaTimes } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
+import { FaSave, FaArrowLeft } from 'react-icons/fa';
 import styles from './editor.module.scss';
+import ImageUploader from '@/app/components/ui/ImageUploader';
 
-const categories = [
-  { id: 'huong-dan', name: 'Hướng dẫn' },
-  { id: 'tin-tuc', name: 'Tin tức' },
-  { id: 'meo-hay', name: 'Mẹo hay' },
-  { id: 'khuyen-mai', name: 'Khuyến mãi' }
-];
+// Import React Quill động để tránh lỗi SSR
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
 
-export default function NewPost() {
-  const [formData, setFormData] = useState({
-    title: '',
-    excerpt: '',
-    content: '',
-    category: '',
-    image: '',
-    status: 'draft'
-  });
-  const [loading, setLoading] = useState(false);
+// Định nghĩa kiểu dữ liệu cho bài viết
+interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  featuredImage: string;
+  category: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+  status: 'draft' | 'published';
+}
+
+export default function NewPostPage() {
+  const router = useRouter();
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [excerpt, setExcerpt] = useState('');
+  const [featuredImage, setFeaturedImage] = useState('');
+  const [category, setCategory] = useState('news');
+  const [status, setStatus] = useState<'draft' | 'published'>('draft');
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  // Cấu hình cho React Quill
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'color': [] }, { 'background': [] }],
+      ['link', 'image'],
+      ['clean']
+    ],
   };
 
-  const [isClient, setIsClient] = useState(false);
+  // Tạo slug từ tiêu đề
+  const createSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd')
+      .replace(/[^a-z0-9\s]/g, '')
+      .replace(/\s+/g, '-');
+  };
 
-  // Đánh dấu khi component được mount ở client-side
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  // Xử lý khi tải ảnh lên
+  const handleImageUpload = (imageUrl: string) => {
+    setFeaturedImage(imageUrl);
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Lưu bài viết
+  const handleSavePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
-    setSuccess('');
+    setIsSaving(true);
 
     try {
-      // Kiểm tra dữ liệu
-      if (!formData.title || !formData.content || !formData.category) {
-        throw new Error('Vui lòng điền đầy đủ thông tin bắt buộc');
+      if (!title || !content) {
+        throw new Error('Vui lòng nhập tiêu đề và nội dung bài viết');
       }
 
-      if (!isClient) {
-        // Nếu chưa ở client-side, chỉ hiển thị thông báo thành công
-        setSuccess('Bài viết đã được tạo thành công!');
-        setLoading(false);
-        return;
-      }
+      // Tạo slug từ tiêu đề
+      const slug = createSlug(title);
 
-      // Lưu bài viết vào localStorage để mô phỏng cơ sở dữ liệu
-      const posts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
-      const newPost = {
-        id: `post-${Date.now()}`,
-        title: formData.title,
-        excerpt: formData.excerpt,
-        content: formData.content,
-        category: formData.category,
-        image: formData.image || 'https://via.placeholder.com/600x400/1a1a1a/ff0000?text=Blog+Post',
-        status: formData.status,
-        date: new Date().toLocaleDateString('vi-VN'),
-        views: 0
+      // Tạo bài viết mới
+      const newPost: Post = {
+        id: Date.now(),
+        title,
+        slug,
+        content,
+        excerpt: excerpt || title,
+        featuredImage,
+        category,
+        author: 'Admin',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status
       };
 
-      posts.push(newPost);
-      localStorage.setItem('blogPosts', JSON.stringify(posts));
+      // Lấy danh sách bài viết hiện có từ localStorage
+      const existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+      
+      // Thêm bài viết mới vào danh sách
+      const updatedPosts = [newPost, ...existingPosts];
+      
+      // Lưu danh sách bài viết vào localStorage
+      localStorage.setItem('posts', JSON.stringify(updatedPosts));
 
-      setSuccess('Bài viết đã được tạo thành công!');
-
-      // Chuyển hướng sau khi lưu thành công
+      // Chuyển hướng đến trang danh sách bài viết
       setTimeout(() => {
-        window.location.href = '/admin/posts';
-      }, 2000);
-    } catch (err: any) {
-      setError(err.message || 'Đã xảy ra lỗi khi lưu bài viết');
-      console.error(err);
+        router.push('/admin/posts');
+      }, 500);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Đã xảy ra lỗi khi lưu bài viết');
+      }
+      console.error('Error saving post:', error);
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const handleCancel = () => {
-    window.location.href = '/admin/posts';
-  };
-
   return (
-    <div className={styles.editorContainer}>
-      {error && (
-        <div className="admin-alert error">
-          <p>{error}</p>
-        </div>
-      )}
+    <div className={styles.editorPage}>
+      <div className={styles.header}>
+        <button 
+          className={styles.backButton}
+          onClick={() => router.push('/admin/posts')}
+        >
+          <FaArrowLeft /> Quay lại
+        </button>
+        <button 
+          className={styles.saveButton}
+          onClick={handleSavePost}
+          disabled={isSaving}
+        >
+          <FaSave /> {isSaving ? 'Đang lưu...' : 'Lưu bài viết'}
+        </button>
+      </div>
 
-      {success && (
-        <div className="admin-alert success">
-          <p>{success}</p>
-        </div>
-      )}
+      {error && <div className={styles.errorMessage}>{error}</div>}
 
-      <form onSubmit={handleSubmit} className="admin-form">
-        <div className="admin-card">
-          <h3>Thông tin bài viết</h3>
-
-          <div className="form-group">
-            <label htmlFor="title">Tiêu đề *</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Nhập tiêu đề bài viết"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="excerpt">Mô tả ngắn</label>
-            <textarea
-              id="excerpt"
-              name="excerpt"
-              value={formData.excerpt}
-              onChange={handleChange}
-              placeholder="Nhập mô tả ngắn cho bài viết"
-              rows={3}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="category">Danh mục *</label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              required
-            >
-              <option value="">-- Chọn danh mục --</option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="image">URL hình ảnh đại diện</label>
-            <input
-              type="text"
-              id="image"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="Nhập URL hình ảnh đại diện"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="status">Trạng thái</label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              <option value="draft">Bản nháp</option>
-              <option value="published">Xuất bản</option>
-            </select>
-          </div>
+      <form className={styles.editorForm}>
+        <div className={styles.formGroup}>
+          <label htmlFor="title">Tiêu đề</label>
+          <input
+            type="text"
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Nhập tiêu đề bài viết"
+            required
+          />
         </div>
 
-        <div className="admin-card">
-          <h3>Nội dung bài viết *</h3>
-          <div className={styles.editorWrapper}>
-            <textarea
-              name="content"
-              value={formData.content}
-              onChange={handleChange}
+        <div className={styles.formGroup}>
+          <label htmlFor="excerpt">Tóm tắt</label>
+          <textarea
+            id="excerpt"
+            value={excerpt}
+            onChange={(e) => setExcerpt(e.target.value)}
+            placeholder="Nhập tóm tắt bài viết (tùy chọn)"
+            rows={3}
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <ImageUploader
+            initialImage={featuredImage}
+            onImageUpload={handleImageUpload}
+            label="Ảnh đại diện"
+          />
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="category">Danh mục</label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            <option value="news">Tin tức</option>
+            <option value="guide">Hướng dẫn</option>
+            <option value="promotion">Khuyến mãi</option>
+            <option value="event">Sự kiện</option>
+          </select>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="status">Trạng thái</label>
+          <select
+            id="status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as 'draft' | 'published')}
+          >
+            <option value="draft">Bản nháp</option>
+            <option value="published">Xuất bản</option>
+          </select>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="content">Nội dung</label>
+          <div className={styles.editorContainer}>
+            <ReactQuill
+              value={content}
+              onChange={setContent}
+              modules={modules}
               placeholder="Nhập nội dung bài viết..."
-              className={styles.simpleEditor}
-              rows={15}
-            ></textarea>
-            <div className={styles.editorHelp}>
-              <p>Mẹo: Bạn có thể sử dụng HTML cơ bản để định dạng văn bản:</p>
-              <ul>
-                <li><code>&lt;h2&gt;Tiêu đề&lt;/h2&gt;</code> - Tiêu đề</li>
-                <li><code>&lt;p&gt;Đoạn văn bản&lt;/p&gt;</code> - Đoạn văn bản</li>
-                <li><code>&lt;strong&gt;Chữ đậm&lt;/strong&gt;</code> - <strong>Chữ đậm</strong></li>
-                <li><code>&lt;em&gt;Chữ nghiêng&lt;/em&gt;</code> - <em>Chữ nghiêng</em></li>
-                <li><code>&lt;ul&gt;&lt;li&gt;Danh sách&lt;/li&gt;&lt;/ul&gt;</code> - Danh sách</li>
-                <li><code>&lt;a href="url"&gt;Liên kết&lt;/a&gt;</code> - Liên kết</li>
-              </ul>
-            </div>
+              theme="snow"
+            />
           </div>
-        </div>
-
-        <div className="form-actions">
-          <button
-            type="button"
-            className="admin-btn secondary"
-            onClick={handleCancel}
-            disabled={loading}
-          >
-            <FaTimes /> Hủy bỏ
-          </button>
-
-          <button
-            type="submit"
-            className="admin-btn primary"
-            disabled={loading}
-          >
-            <FaSave /> {loading ? 'Đang lưu...' : 'Lưu bài viết'}
-          </button>
         </div>
       </form>
     </div>
