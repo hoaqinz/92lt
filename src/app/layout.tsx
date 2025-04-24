@@ -12,8 +12,9 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "KBET - Online Casino & Sports Betting",
-  description: "Experience the ultimate online betting platform with KBET",
+  title: "92LOTTERY - Xổ Số & Casino Trực Tuyến Hàng Đầu Việt Nam",
+  description: "92LOTTERY - Nền tảng xổ số, casino và cá cược trực tuyến uy tín hàng đầu Việt Nam. Đa dạng trò chơi, thanh toán nhanh chóng, bảo mật tuyệt đối.",
+  keywords: "92lottery, 92 lottery, xổ số trực tuyến, casino trực tuyến, cá cược thể thao, win go, k3 lotre, 5d lotre, slots, bắn cá, game bài, sòng bài trực tuyến",
 };
 
 export default function RootLayout({
@@ -22,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <body className={`${roboto.variable}`}>
         <Header />
         <main>
