@@ -1,0 +1,8 @@
+[build]
+command = "npm run cloudflare-build"
+output_directory = "out"
+node_version = "18.18.0"
+
+[build.environment]
+NODE_VERSION = "18.18.0"
+NPM_FLAGS = "--no-package-lock"

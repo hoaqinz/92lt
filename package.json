@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "cloudflare-build": "npm install --legacy-peer-deps && next build"
+    "cloudflare-build": "rm -f package-lock.json && npm install --no-package-lock && next build"
   },
   "dependencies": {
     "next": "15.3.1",
@@ -27,5 +27,8 @@
     "eslint-config-next": "15.3.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.18.0"
   }
 }
