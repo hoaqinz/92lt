@@ -41,42 +41,65 @@ export default function ImageUploader({
     setError('');
     setIsUploading(true);
 
+    // Tạo URL tạm thời để xem trước ảnh ngay lập tức
+    let previewUrl = '';
     try {
-      // Tạo URL tạm thời để xem trước ảnh ngay lập tức
-      const previewUrl = URL.createObjectURL(file);
+      previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
-
+      
       // Tạo FormData để gửi file lên server
       const formData = new FormData();
       formData.append('file', file);
 
+      console.log('Đang tải ảnh lên Cloudflare Images...');
+      
       // Gửi request đến API route của Next.js
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Lỗi khi tải ảnh lên');
+      
+      console.log('Response status:', response.status);
+      
+      // Đọc response text trước để debug
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      // Nếu response không phải JSON hợp lệ
+      if (!responseText || responseText.trim() === '') {
+        throw new Error('Server trả về response rỗng');
       }
-
-      const data = await response.json();
       
-      // Sử dụng URL từ Cloudflare Images
-      onImageUpload(data.url);
+      // Parse JSON từ text
+      const data = JSON.parse(responseText);
       
-      // Cập nhật preview với URL thực tế
-      setImagePreview(data.url);
+      if (!response.ok) {
+        throw new Error(data.error || 'Lỗi khi tải ảnh lên');
+      }
       
       console.log('Ảnh đã được tải lên Cloudflare Images:', data);
+      
+      // Xóa URL tạm thời
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      
+      // Sử dụng URL từ Cloudflare Images
+      if (data.url) {
+        onImageUpload(data.url);
+        
+        // Cập nhật preview với URL thực tế
+        setImagePreview(data.url);
+      } else {
+        throw new Error('Không nhận được URL ảnh từ server');
+      }
     } catch (error) {
       console.error('Error uploading image:', error);
       setError(error instanceof Error ? error.message : 'Có lỗi xảy ra khi tải ảnh lên');
       
-      // Giữ lại URL xem trước tạm thời nếu có lỗi
-      if (imagePreview) {
-        onImageUpload(imagePreview);
+      // Sử dụng URL tạm thời nếu có lỗi
+      if (previewUrl) {
+        onImageUpload(previewUrl);
       }
     } finally {
       setIsUploading(false);
