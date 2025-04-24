@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import styles from './casino.module.scss';
 
 // Mock data for game categories

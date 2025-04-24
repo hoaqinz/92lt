@@ -1,21 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import styles from './Header.module.scss';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('popular');
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    // Get tab from URL or default to 'popular'
-    const tab = searchParams.get('tab') || 'popular';
-    setActiveTab(tab);
-  }, [searchParams]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

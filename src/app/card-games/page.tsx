@@ -1,16 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import styles from './card-games.module.scss';
 
 export default function CardGamesPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to home page with tab=card-games
-    router.push('/?tab=card-games');
-  }, [router]);
+  // Thay đổi cách redirect để không sử dụng useRouter
+  if (typeof window !== 'undefined') {
+    window.location.href = '/?tab=card-games';
+  }
 
   return (
     <div className={styles.loadingContainer}>

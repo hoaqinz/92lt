@@ -1,16 +1,12 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import styles from './mini-games.module.scss';
 
 export default function MiniGamesPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to home page with tab=mini-games
-    router.push('/?tab=mini-games');
-  }, [router]);
+  // Thay đổi cách redirect để không sử dụng useRouter
+  if (typeof window !== 'undefined') {
+    window.location.href = '/?tab=mini-games';
+  }
 
   return (
     <div className={styles.loadingContainer}>
