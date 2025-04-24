@@ -35,12 +35,14 @@ Tài liệu này hướng dẫn cách cấu hình Cloudflare Images để sử d
 2. Thêm các biến môi trường sau:
 
 ```
-CLOUDFLARE_ACCOUNT_ID=your_account_id_here
-CLOUDFLARE_API_TOKEN=your_api_token_here
+CLOUDFLARE_ACCOUNT_ID=04725e5acc15b760fb22bf197ff9799f
+CLOUDFLARE_API_TOKEN=JZYoQdkbYec97Na325HqQwEJAUn12Wh_tw6iUtPp
+CLOUDFLARE_ACCOUNT_HASH=tJAHQehMkQM0pKlceH1PGg
+CLOUDFLARE_IMAGE_DELIVERY_URL=https://imagedelivery.net/tJAHQehMkQM0pKlceH1PGg
 ```
 
-3. Thay thế `your_account_id_here` bằng Account ID của bạn
-4. Thay thế `your_api_token_here` bằng API Token bạn đã tạo
+3. Các giá trị này đã được cấu hình sẵn cho dự án 92LOTTERY
+4. Không cần thay đổi các giá trị này trừ khi bạn muốn sử dụng tài khoản Cloudflare khác
 
 ## 5. Cấu hình Cloudflare Images
 

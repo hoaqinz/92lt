@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     cloudflareFormData.append('file', file);
     
     // Lấy thông tin xác thực từ biến môi trường
-    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-    const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID || '04725e5acc15b760fb22bf197ff9799f';
+    const apiToken = process.env.CLOUDFLARE_API_TOKEN || 'JZYoQdkbYec97Na325HqQwEJAUn12Wh_tw6iUtPp';
     
     if (!accountId || !apiToken) {
       console.error('Thiếu thông tin xác thực Cloudflare');
@@ -67,11 +67,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Lấy account hash từ biến môi trường
+    const accountHash = process.env.CLOUDFLARE_ACCOUNT_HASH || 'tJAHQehMkQM0pKlceH1PGg';
+    
+    // Tạo URL đầy đủ cho ảnh
+    const imageUrl = `https://imagedelivery.net/${accountHash}/${uploadResult.result.id}/medium`;
+    
     // Trả về URL của ảnh đã tải lên
     return NextResponse.json({
       success: true,
-      url: uploadResult.result.variants[0],
-      id: uploadResult.result.id
+      url: imageUrl,
+      id: uploadResult.result.id,
+      variants: {
+        thumbnail: `https://imagedelivery.net/${accountHash}/${uploadResult.result.id}/thumbnail`,
+        medium: `https://imagedelivery.net/${accountHash}/${uploadResult.result.id}/medium`,
+        large: `https://imagedelivery.net/${accountHash}/${uploadResult.result.id}/large`
+      }
     });
   } catch (error) {
     console.error('Lỗi xử lý tải ảnh lên:', error);
