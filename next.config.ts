@@ -14,8 +14,9 @@ const nextConfig: NextConfig = {
   },
   // Bỏ qua lỗi dynamic routes
   experimental: {
-    missingSuspenseWithCSRBailout: false,
+    appDir: true,
   },
+  distDir: 'out',
 };
 
 export default nextConfig;
