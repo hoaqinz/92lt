@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { FaFire, FaStar, FaGamepad, FaTrophy } from 'react-icons/fa';
 import styles from './casino.module.scss';
 
 // Mock data for game categories
@@ -192,49 +193,14 @@ export default function Casino() {
 
   const gamesToShow = gamesData[selectedCategory] || gamesData.all;
 
+  // Thay đổi cách redirect để không sử dụng useRouter
+  if (typeof window !== 'undefined') {
+    window.location.href = '/?tab=casino';
+  }
+
   return (
-    <div className={styles.casinoPage}>
-      <div className={styles.casinoHero}>
-        <div className="container">
-          <h1><span>Trò chơi</span> Casino</h1>
-          <p>Khám phá bộ sưu tập trò chơi casino cao cấp từ các nhà cung cấp hàng đầu thế giới. Tìm trò chơi yêu thích hoặc khám phá các trò chơi hấp dẫn mới!</p>
-        </div>
-      </div>
-
-      <div className="container">
-        <div className={styles.casinoContent}>
-          <div className={styles.casinoSidebar}>
-            <div className={styles.searchBox}>
-              <input type="text" placeholder="Tìm kiếm trò chơi..." />
-              <button className="btn btn-primary">Tìm kiếm</button>
-            </div>
-
-            <div className={styles.providersFilter}>
-              <h3>Nhà cung cấp</h3>
-              <ul>
-                <li><label><input type="checkbox" /> NetEnt</label></li>
-                <li><label><input type="checkbox" /> Pragmatic Play</label></li>
-                <li><label><input type="checkbox" /> Microgaming</label></li>
-                <li><label><input type="checkbox" /> Play'n GO</label></li>
-                <li><label><input type="checkbox" /> Evolution Gaming</label></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className={styles.casinoMain}>
-            <CategoryTabs
-              categories={categories}
-              onSelectCategory={handleSelectCategory}
-            />
-
-            <div className="grid-3">
-              {gamesToShow.map((game, index) => (
-                <GameCard key={index} game={game} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className={styles.loadingContainer}>
+      <div className={styles.loadingSpinner}></div>
     </div>
   );
 }
