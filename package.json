@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "cloudflare-build": "rm -f package-lock.json && npm install --no-package-lock && next build"
+    "cloudflare-build": "./build.sh"
   },
   "dependencies": {
     "next": "15.3.1",

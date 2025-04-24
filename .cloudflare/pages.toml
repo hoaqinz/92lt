@@ -1,8 +1,9 @@
 [build]
-command = "npm run cloudflare-build"
+command = "bash ./build.sh"
 output_directory = "out"
 node_version = "18.18.0"
 
 [build.environment]
 NODE_VERSION = "18.18.0"
-NPM_FLAGS = "--no-package-lock"
+NPM_CONFIG_LEGACY_PEER_DEPS = "true"
+NPM_CONFIG_FORCE = "true"
