@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 92LOTTERY
 
-## Getting Started
+92LOTTERY là nền tảng xổ số, casino và cá cược trực tuyến hàng đầu Việt Nam.
 
-First, run the development server:
+## Tính năng
+
+- Xổ số trực tuyến (WinGo, K3 lotre, 5D lotre)
+- Slots games
+- Casino trực tuyến
+- Cá cược thể thao
+- Game bài
+- Bắn cá
+- Mini games
+- Hệ thống khuyến mãi
+- Blog tin tức
+
+## Công nghệ sử dụng
+
+- Next.js 14
+- TypeScript
+- SCSS Modules
+- Cloudflare Pages (hosting)
+- Cloudflare Images (lưu trữ hình ảnh)
+
+## Cài đặt và chạy
+
+### Yêu cầu
+
+- Node.js 18.18.0 hoặc cao hơn
+- npm 9.8.0 hoặc cao hơn
+
+### Cài đặt
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone repository
+git clone https://github.com/hoaqinz/92lt.git
+cd 92lt
+
+# Cài đặt dependencies
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Chạy ứng dụng
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Chạy môi trường development
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Build ứng dụng
+npm run build
 
-## Learn More
+# Chạy môi trường production
+npm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Triển khai lên Cloudflare Pages
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+# Build cho Cloudflare Pages
+npm run cloudflare-build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Cấu hình Cloudflare Images
 
-## Deploy on Vercel
+Ứng dụng sử dụng Cloudflare Images để lưu trữ và quản lý hình ảnh. Để cấu hình:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Sao chép file `.env.local.example` thành `.env.local`
+2. Cập nhật các biến môi trường với thông tin Cloudflare của bạn
+3. Xem hướng dẫn chi tiết tại [docs/cloudflare-images-setup.md](docs/cloudflare-images-setup.md)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Quản trị viên
+
+Truy cập trang quản trị tại `/admin/login` với thông tin đăng nhập:
+- Tên đăng nhập: `admin92lottery`
+- Mật khẩu: `secure_password_123`
+
+## Tối ưu hóa SEO
+
+Ứng dụng đã được tối ưu hóa SEO cho từ khóa "92lottery" với:
+- Thẻ meta title, description và keywords
+- Thẻ Open Graph và Twitter Card
+- Cấu trúc URL thân thiện với SEO
+- Ngôn ngữ tiếng Việt (vi)
+
+## Giấy phép
+
+© 2023 92LOTTERY. Đã đăng ký bản quyền.
