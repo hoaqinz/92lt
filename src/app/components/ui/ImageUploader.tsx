@@ -32,9 +32,9 @@ export default function ImageUploader({
       return;
     }
 
-    // Kiểm tra kích thước file (giới hạn 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Kích thước file không được vượt quá 5MB');
+    // Kiểm tra kích thước file (giới hạn 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Kích thước file không được vượt quá 10MB');
       return;
     }
 
@@ -42,20 +42,42 @@ export default function ImageUploader({
     setIsUploading(true);
 
     try {
-      // Tạo URL tạm thời để xem trước ảnh
+      // Tạo URL tạm thời để xem trước ảnh ngay lập tức
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
 
-      // Trong môi trường thực tế, bạn sẽ tải ảnh lên server
-      // Ở đây chúng ta mô phỏng việc tải lên bằng cách chờ 1 giây
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Tạo FormData để gửi file lên server
+      const formData = new FormData();
+      formData.append('file', file);
 
-      // Trong ứng dụng thực tế, bạn sẽ nhận URL từ server
-      // Ở đây chúng ta sử dụng URL tạm thời
-      onImageUpload(previewUrl);
+      // Gửi request đến API route của Next.js
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Lỗi khi tải ảnh lên');
+      }
+
+      const data = await response.json();
+      
+      // Sử dụng URL từ Cloudflare Images
+      onImageUpload(data.url);
+      
+      // Cập nhật preview với URL thực tế
+      setImagePreview(data.url);
+      
+      console.log('Ảnh đã được tải lên Cloudflare Images:', data);
     } catch (error) {
       console.error('Error uploading image:', error);
-      setError('Có lỗi xảy ra khi tải ảnh lên');
+      setError(error instanceof Error ? error.message : 'Có lỗi xảy ra khi tải ảnh lên');
+      
+      // Giữ lại URL xem trước tạm thời nếu có lỗi
+      if (imagePreview) {
+        onImageUpload(imagePreview);
+      }
     } finally {
       setIsUploading(false);
     }
