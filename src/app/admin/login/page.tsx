@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './login.module.scss';
 
 export default function AdminLogin() {
@@ -8,6 +8,31 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Đánh dấu khi component được mount ở client-side
+  useEffect(() => {
+    setIsClient(true);
+
+    // Kiểm tra nếu đã đăng nhập thì chuyển hướng đến dashboard
+    if (typeof window !== 'undefined') {
+      const authData = localStorage.getItem('adminAuth');
+      if (authData) {
+        try {
+          const parsedData = JSON.parse(authData);
+          const { isLoggedIn, timestamp } = parsedData;
+          const now = new Date().getTime();
+          const expirationTime = 24 * 60 * 60 * 1000; // 24 giờ
+
+          if (isLoggedIn && now - timestamp < expirationTime) {
+            window.location.href = '/admin/dashboard';
+          }
+        } catch (err) {
+          console.error('Error parsing auth data:', err);
+        }
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,17 +50,19 @@ export default function AdminLogin() {
           timestamp: new Date().getTime()
         });
 
-        localStorage.setItem('adminAuth', authData);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('adminAuth', authData);
 
-        // Thiết lập cookie cho middleware
-        document.cookie = `adminAuth=${authData}; path=/; max-age=${24 * 60 * 60}`;
+          // Thiết lập cookie cho middleware
+          document.cookie = `adminAuth=${authData}; path=/; max-age=${24 * 60 * 60}`;
 
-        console.log('Login successful, redirecting...');
+          console.log('Login successful, redirecting...');
 
-        // Chuyển hướng đến trang admin sau một khoảng thời gian ngắn
-        setTimeout(() => {
-          window.location.href = '/admin/dashboard';
-        }, 500);
+          // Chuyển hướng đến trang admin sau một khoảng thời gian ngắn
+          setTimeout(() => {
+            window.location.href = '/admin/dashboard';
+          }, 500);
+        }
       } else {
         setError('Tên đăng nhập hoặc mật khẩu không đúng');
       }

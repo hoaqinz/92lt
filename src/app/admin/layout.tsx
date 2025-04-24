@@ -52,12 +52,16 @@ export default function AdminLayout({
           }
 
           // Nếu không đăng nhập hoặc đã hết hạn, chuyển hướng đến trang đăng nhập
-          console.log('Redirecting to login page');
-          window.location.href = '/admin/login';
+          // Chỉ chuyển hướng nếu không đang ở trang login
+          if (window.location.pathname !== '/admin/login') {
+            console.log('Redirecting to login page');
+            window.location.href = '/admin/login';
+          }
         }
       } catch (error) {
         console.error('Error checking auth:', error);
-        if (typeof window !== 'undefined') {
+        // Chỉ chuyển hướng nếu không đang ở trang login
+        if (typeof window !== 'undefined' && window.location.pathname !== '/admin/login') {
           window.location.href = '/admin/login';
         }
       }
