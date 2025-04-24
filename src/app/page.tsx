@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import Banner from './components/ui/Banner';
 import TabContent from './components/ui/TabContent';
 import PromotionSection from './components/ui/PromotionSection';

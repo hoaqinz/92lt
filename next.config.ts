@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   distDir: 'out',
+  experimental: {
+    missingSuspenseWithCSRBailout: false
+  }
 };
 
 export default nextConfig;

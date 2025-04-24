@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "cloudflare-build": "npm install --force --legacy-peer-deps && NEXT_DISABLE_ESLINT=1 NEXT_DISABLE_DYNAMIC_ROUTE_VALIDATION=1 next build"
+    "cloudflare-build": "npm install --force --legacy-peer-deps && NEXT_DISABLE_ESLINT=1 NEXT_DISABLE_DYNAMIC_ROUTE_VALIDATION=1 NEXT_MISSING_SUSPENSE_WITH_CSR_BAILOUT=1 next build"
   },
   "dependencies": {
     "next": "15.3.1",
