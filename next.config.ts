@@ -12,10 +12,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Bỏ qua lỗi dynamic routes
-  experimental: {
-    appDir: true,
-  },
   distDir: 'out',
 };
 
