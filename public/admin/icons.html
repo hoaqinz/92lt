@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>92LOTTERY Admin - Icons</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #1a1a1a;
+            color: white;
+            padding: 20px 0;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 20px;
+            color: #e60000;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: #333;
+            color: white;
+        }
+        
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            border: none;
+            color: #e60000;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logout-btn i {
+            margin-right: 5px;
+        }
+        
+        .action-buttons {
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #e60000;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #cc0000;
+        }
+        
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .icon-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .icon-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+        
+        .icon-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .icon-category {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .icon-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .btn-edit {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background-color: #0b7dda;
+        }
+        
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background-color: #d32f2f;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .close-modal {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 100px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>92LOTTERY</h1>
+            <p>Admin Panel</p>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li><a href="/admin/dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="/admin/posts.html"><i class="fas fa-newspaper"></i> Bài viết</a></li>
+            <li><a href="/admin/banners.html"><i class="fas fa-image"></i> Banners</a></li>
+            <li><a href="/admin/icons.html" class="active"><i class="fas fa-icons"></i> Icons</a></li>
+            <li><a href="/admin/promotions.html"><i class="fas fa-gift"></i> Khuyến mãi</a></li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>Quản lý Icons</h1>
+            <button id="logout-btn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="add-icon-btn"><i class="fas fa-plus"></i> Thêm icon mới</button>
+        </div>
+        
+        <div class="icons-grid" id="icons-container">
+            <!-- Icon cards will be added here dynamically -->
+        </div>
+    </div>
+    
+    <!-- Add/Edit Icon Modal -->
+    <div class="modal" id="icon-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Thêm icon mới</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            
+            <form id="icon-form">
+                <input type="hidden" id="icon-id">
+                
+                <div class="form-group">
+                    <label for="icon-name">Tên icon</label>
+                    <input type="text" id="icon-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="icon-image">Hình ảnh URL</label>
+                    <input type="text" id="icon-image" required>
+                    <div id="image-preview-container">
+                        <img id="image-preview" class="preview-image" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="icon-category">Danh mục</label>
+                    <select id="icon-category">
+                        <option value="lottery">Xổ số</option>
+                        <option value="slots">Slots</option>
+                        <option value="casino">Casino</option>
+                        <option value="sports">Thể thao</option>
+                        <option value="card-games">Game bài</option>
+                        <option value="fishing">Bắn cá</option>
+                        <option value="mini-games">Mini game</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="icon-order">Thứ tự hiển thị</label>
+                    <input type="number" id="icon-order" min="1" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="icon-status">Trạng thái</label>
+                    <select id="icon-status">
+                        <option value="active">Hiển thị</option>
+                        <option value="inactive">Ẩn</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-btn">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="save-icon-btn">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kiểm tra đăng nhập
+            const authData = localStorage.getItem('adminAuth');
+            if (!authData) {
+                window.location.href = '/admin/login.html';
+                return;
+            }
+            
+            try {
+                const parsedData = JSON.parse(authData);
+                const { isLoggedIn, timestamp } = parsedData;
+                const now = new Date().getTime();
+                const expirationTime = 24 * 60 * 60 * 1000; // 24 giờ
+                
+                if (!isLoggedIn || now - timestamp > expirationTime) {
+                    window.location.href = '/admin/login.html';
+                }
+            } catch (err) {
+                console.error('Error parsing auth data:', err);
+                window.location.href = '/admin/login.html';
+            }
+            
+            // Xử lý đăng xuất
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('adminAuth');
+                document.cookie = 'adminAuth=; path=/; max-age=0';
+                window.location.href = '/admin/login.html';
+            });
+            
+            // Dữ liệu mẫu cho icons
+            let icons = JSON.parse(localStorage.getItem('icons')) || [
+                {
+                    id: 1,
+                    name: 'WinGo',
+                    image: 'https://via.placeholder.com/200/e60000/ffffff?text=WinGo',
+                    category: 'lottery',
+                    order: 1,
+                    status: 'active'
+                },
+                {
+                    id: 2,
+                    name: 'K3 Lotre',
+                    image: 'https://via.placeholder.com/200/0066cc/ffffff?text=K3',
+                    category: 'lottery',
+                    order: 2,
+                    status: 'active'
+                },
+                {
+                    id: 3,
+                    name: '5D Lotre',
+                    image: 'https://via.placeholder.com/200/009933/ffffff?text=5D',
+                    category: 'lottery',
+                    order: 3,
+                    status: 'active'
+                },
+                {
+                    id: 4,
+                    name: 'PG Game',
+                    image: 'https://via.placeholder.com/200/ff9900/ffffff?text=PG',
+                    category: 'slots',
+                    order: 1,
+                    status: 'active'
+                },
+                {
+                    id: 5,
+                    name: 'JILI Game',
+                    image: 'https://via.placeholder.com/200/9900cc/ffffff?text=JILI',
+                    category: 'slots',
+                    order: 2,
+                    status: 'active'
+                },
+                {
+                    id: 6,
+                    name: 'DG Casino',
+                    image: 'https://via.placeholder.com/200/cc0000/ffffff?text=DG',
+                    category: 'casino',
+                    order: 1,
+                    status: 'active'
+                },
+                {
+                    id: 7,
+                    name: 'WM Casino',
+                    image: 'https://via.placeholder.com/200/006600/ffffff?text=WM',
+                    category: 'casino',
+                    order: 2,
+                    status: 'active'
+                },
+                {
+                    id: 8,
+                    name: 'V8 Poker',
+                    image: 'https://via.placeholder.com/200/0099cc/ffffff?text=V8',
+                    category: 'card-games',
+                    order: 1,
+                    status: 'active'
+                }
+            ];
+            
+            // Lưu dữ liệu mẫu vào localStorage nếu chưa có
+            if (!localStorage.getItem('icons')) {
+                localStorage.setItem('icons', JSON.stringify(icons));
+            }
+            
+            // Hiển thị danh sách icons
+            function renderIcons() {
+                const container = document.getElementById('icons-container');
+                container.innerHTML = '';
+                
+                // Sắp xếp icons theo danh mục và thứ tự
+                icons.sort((a, b) => {
+                    if (a.category !== b.category) {
+                        return a.category.localeCompare(b.category);
+                    }
+                    return a.order - b.order;
+                });
+                
+                icons.forEach(icon => {
+                    const card = document.createElement('div');
+                    card.className = 'icon-card';
+                    
+                    // Chuyển đổi tên danh mục sang tiếng Việt
+                    let categoryName = '';
+                    switch (icon.category) {
+                        case 'lottery': categoryName = 'Xổ số'; break;
+                        case 'slots': categoryName = 'Slots'; break;
+                        case 'casino': categoryName = 'Casino'; break;
+                        case 'sports': categoryName = 'Thể thao'; break;
+                        case 'card-games': categoryName = 'Game bài'; break;
+                        case 'fishing': categoryName = 'Bắn cá'; break;
+                        case 'mini-games': categoryName = 'Mini game'; break;
+                        default: categoryName = icon.category;
+                    }
+                    
+                    card.innerHTML = `
+                        <img src="${icon.image}" alt="${icon.name}" class="icon-image">
+                        <h3 class="icon-title">${icon.name}</h3>
+                        <div class="icon-category">${categoryName}</div>
+                        <div class="icon-actions">
+                            <button class="btn btn-sm btn-edit" data-id="${icon.id}"><i class="fas fa-edit"></i> Sửa</button>
+                            <button class="btn btn-sm btn-delete" data-id="${icon.id}"><i class="fas fa-trash"></i> Xóa</button>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+                
+                // Thêm event listeners cho các nút
+                document.querySelectorAll('.btn-edit').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        editIcon(id);
+                    });
+                });
+                
+                document.querySelectorAll('.btn-delete').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteIcon(id);
+                    });
+                });
+            }
+            
+            // Hiển thị modal thêm/sửa icon
+            function showModal(isEdit = false) {
+                document.getElementById('modal-title').textContent = isEdit ? 'Sửa icon' : 'Thêm icon mới';
+                document.getElementById('icon-modal').style.display = 'block';
+            }
+            
+            // Ẩn modal
+            function hideModal() {
+                document.getElementById('icon-modal').style.display = 'none';
+                document.getElementById('icon-form').reset();
+                document.getElementById('icon-id').value = '';
+                document.getElementById('image-preview').style.display = 'none';
+            }
+            
+            // Thêm icon mới
+            function addIcon() {
+                showModal(false);
+            }
+            
+            // Sửa icon
+            function editIcon(id) {
+                const icon = icons.find(i => i.id === id);
+                if (icon) {
+                    document.getElementById('icon-id').value = icon.id;
+                    document.getElementById('icon-name').value = icon.name;
+                    document.getElementById('icon-image').value = icon.image;
+                    document.getElementById('icon-category').value = icon.category;
+                    document.getElementById('icon-order').value = icon.order;
+                    document.getElementById('icon-status').value = icon.status;
+                    
+                    // Hiển thị preview hình ảnh
+                    const imagePreview = document.getElementById('image-preview');
+                    imagePreview.src = icon.image;
+                    imagePreview.style.display = 'block';
+                    
+                    showModal(true);
+                }
+            }
+            
+            // Xóa icon
+            function deleteIcon(id) {
+                if (confirm('Bạn có chắc chắn muốn xóa icon này?')) {
+                    icons = icons.filter(i => i.id !== id);
+                    localStorage.setItem('icons', JSON.stringify(icons));
+                    renderIcons();
+                }
+            }
+            
+            // Lưu icon
+            function saveIcon(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('icon-id').value;
+                const name = document.getElementById('icon-name').value;
+                const image = document.getElementById('icon-image').value;
+                const category = document.getElementById('icon-category').value;
+                const order = parseInt(document.getElementById('icon-order').value);
+                const status = document.getElementById('icon-status').value;
+                
+                if (id) {
+                    // Cập nhật icon
+                    const index = icons.findIndex(i => i.id === parseInt(id));
+                    if (index !== -1) {
+                        icons[index] = {
+                            ...icons[index],
+                            name,
+                            image,
+                            category,
+                            order,
+                            status
+                        };
+                    }
+                } else {
+                    // Thêm icon mới
+                    const newId = icons.length > 0 ? Math.max(...icons.map(i => i.id)) + 1 : 1;
+                    icons.push({
+                        id: newId,
+                        name,
+                        image,
+                        category,
+                        order,
+                        status
+                    });
+                }
+                
+                localStorage.setItem('icons', JSON.stringify(icons));
+                hideModal();
+                renderIcons();
+            }
+            
+            // Preview hình ảnh khi nhập URL
+            document.getElementById('icon-image').addEventListener('input', function() {
+                const imageUrl = this.value;
+                const imagePreview = document.getElementById('image-preview');
+                
+                if (imageUrl) {
+                    imagePreview.src = imageUrl;
+                    imagePreview.style.display = 'block';
+                    
+                    // Kiểm tra nếu hình ảnh không tải được
+                    imagePreview.onerror = function() {
+                        imagePreview.style.display = 'none';
+                    };
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            });
+            
+            // Event listeners
+            document.getElementById('add-icon-btn').addEventListener('click', addIcon);
+            document.getElementById('close-modal').addEventListener('click', hideModal);
+            document.getElementById('cancel-btn').addEventListener('click', hideModal);
+            document.getElementById('icon-form').addEventListener('submit', saveIcon);
+            
+            // Hiển thị danh sách icons khi trang được tải
+            renderIcons();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>92LOTTERY Admin - Banners</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #1a1a1a;
+            color: white;
+            padding: 20px 0;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 20px;
+            color: #e60000;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: #333;
+            color: white;
+        }
+        
+        .sidebar-menu a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            border: none;
+            color: #e60000;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logout-btn i {
+            margin-right: 5px;
+        }
+        
+        .action-buttons {
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #e60000;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #cc0000;
+        }
+        
+        .banners-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .banner-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .banner-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .banner-details {
+            padding: 15px;
+        }
+        
+        .banner-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .banner-info {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .banner-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .btn-edit {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background-color: #0b7dda;
+        }
+        
+        .btn-delete {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background-color: #d32f2f;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .close-modal {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>92LOTTERY</h1>
+            <p>Admin Panel</p>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li><a href="/admin/dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="/admin/posts.html"><i class="fas fa-newspaper"></i> Bài viết</a></li>
+            <li><a href="/admin/banners.html" class="active"><i class="fas fa-image"></i> Banners</a></li>
+            <li><a href="/admin/icons.html"><i class="fas fa-icons"></i> Icons</a></li>
+            <li><a href="/admin/promotions.html"><i class="fas fa-gift"></i> Khuyến mãi</a></li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>Quản lý Banners</h1>
+            <button id="logout-btn" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="add-banner-btn"><i class="fas fa-plus"></i> Thêm banner mới</button>
+        </div>
+        
+        <div class="banners-grid" id="banners-container">
+            <!-- Banner cards will be added here dynamically -->
+        </div>
+    </div>
+    
+    <!-- Add/Edit Banner Modal -->
+    <div class="modal" id="banner-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Thêm banner mới</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            
+            <form id="banner-form">
+                <input type="hidden" id="banner-id">
+                
+                <div class="form-group">
+                    <label for="banner-title">Tiêu đề</label>
+                    <input type="text" id="banner-title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="banner-image">Hình ảnh URL</label>
+                    <input type="text" id="banner-image" required>
+                    <div id="image-preview-container">
+                        <img id="image-preview" class="preview-image" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="banner-link">Liên kết (nếu có)</label>
+                    <input type="text" id="banner-link">
+                </div>
+                
+                <div class="form-group">
+                    <label for="banner-order">Thứ tự hiển thị</label>
+                    <input type="number" id="banner-order" min="1" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="banner-status">Trạng thái</label>
+                    <select id="banner-status">
+                        <option value="active">Hiển thị</option>
+                        <option value="inactive">Ẩn</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn" id="cancel-btn">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="save-banner-btn">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kiểm tra đăng nhập
+            const authData = localStorage.getItem('adminAuth');
+            if (!authData) {
+                window.location.href = '/admin/login.html';
+                return;
+            }
+            
+            try {
+                const parsedData = JSON.parse(authData);
+                const { isLoggedIn, timestamp } = parsedData;
+                const now = new Date().getTime();
+                const expirationTime = 24 * 60 * 60 * 1000; // 24 giờ
+                
+                if (!isLoggedIn || now - timestamp > expirationTime) {
+                    window.location.href = '/admin/login.html';
+                }
+            } catch (err) {
+                console.error('Error parsing auth data:', err);
+                window.location.href = '/admin/login.html';
+            }
+            
+            // Xử lý đăng xuất
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                localStorage.removeItem('adminAuth');
+                document.cookie = 'adminAuth=; path=/; max-age=0';
+                window.location.href = '/admin/login.html';
+            });
+            
+            // Dữ liệu mẫu cho banners
+            let banners = JSON.parse(localStorage.getItem('banners')) || [
+                {
+                    id: 1,
+                    title: 'Khuyến mãi tháng 4',
+                    image: 'https://via.placeholder.com/800x400/e60000/ffffff?text=Khuyến+mãi+tháng+4',
+                    link: '/promotions',
+                    order: 1,
+                    status: 'active'
+                },
+                {
+                    id: 2,
+                    title: 'Trò chơi mới',
+                    image: 'https://via.placeholder.com/800x400/0066cc/ffffff?text=Trò+chơi+mới',
+                    link: '/games',
+                    order: 2,
+                    status: 'active'
+                },
+                {
+                    id: 3,
+                    title: 'Thưởng nạp lần đầu',
+                    image: 'https://via.placeholder.com/800x400/009933/ffffff?text=Thưởng+nạp+lần+đầu',
+                    link: '/bonus',
+                    order: 3,
+                    status: 'active'
+                },
+                {
+                    id: 4,
+                    title: 'Sự kiện đặc biệt',
+                    image: 'https://via.placeholder.com/800x400/ff9900/ffffff?text=Sự+kiện+đặc+biệt',
+                    link: '/events',
+                    order: 4,
+                    status: 'inactive'
+                }
+            ];
+            
+            // Lưu dữ liệu mẫu vào localStorage nếu chưa có
+            if (!localStorage.getItem('banners')) {
+                localStorage.setItem('banners', JSON.stringify(banners));
+            }
+            
+            // Hiển thị danh sách banners
+            function renderBanners() {
+                const container = document.getElementById('banners-container');
+                container.innerHTML = '';
+                
+                banners.sort((a, b) => a.order - b.order);
+                
+                banners.forEach(banner => {
+                    const card = document.createElement('div');
+                    card.className = 'banner-card';
+                    
+                    card.innerHTML = `
+                        <img src="${banner.image}" alt="${banner.title}" class="banner-image">
+                        <div class="banner-details">
+                            <h3 class="banner-title">${banner.title}</h3>
+                            <div class="banner-info">
+                                <p>Thứ tự: ${banner.order}</p>
+                                <p>Trạng thái: ${banner.status === 'active' ? 'Hiển thị' : 'Ẩn'}</p>
+                                <p>Liên kết: ${banner.link || 'Không có'}</p>
+                            </div>
+                            <div class="banner-actions">
+                                <button class="btn btn-sm btn-edit" data-id="${banner.id}"><i class="fas fa-edit"></i> Sửa</button>
+                                <button class="btn btn-sm btn-delete" data-id="${banner.id}"><i class="fas fa-trash"></i> Xóa</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+                
+                // Thêm event listeners cho các nút
+                document.querySelectorAll('.btn-edit').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        editBanner(id);
+                    });
+                });
+                
+                document.querySelectorAll('.btn-delete').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteBanner(id);
+                    });
+                });
+            }
+            
+            // Hiển thị modal thêm/sửa banner
+            function showModal(isEdit = false) {
+                document.getElementById('modal-title').textContent = isEdit ? 'Sửa banner' : 'Thêm banner mới';
+                document.getElementById('banner-modal').style.display = 'block';
+            }
+            
+            // Ẩn modal
+            function hideModal() {
+                document.getElementById('banner-modal').style.display = 'none';
+                document.getElementById('banner-form').reset();
+                document.getElementById('banner-id').value = '';
+                document.getElementById('image-preview').style.display = 'none';
+            }
+            
+            // Thêm banner mới
+            function addBanner() {
+                showModal(false);
+            }
+            
+            // Sửa banner
+            function editBanner(id) {
+                const banner = banners.find(b => b.id === id);
+                if (banner) {
+                    document.getElementById('banner-id').value = banner.id;
+                    document.getElementById('banner-title').value = banner.title;
+                    document.getElementById('banner-image').value = banner.image;
+                    document.getElementById('banner-link').value = banner.link || '';
+                    document.getElementById('banner-order').value = banner.order;
+                    document.getElementById('banner-status').value = banner.status;
+                    
+                    // Hiển thị preview hình ảnh
+                    const imagePreview = document.getElementById('image-preview');
+                    imagePreview.src = banner.image;
+                    imagePreview.style.display = 'block';
+                    
+                    showModal(true);
+                }
+            }
+            
+            // Xóa banner
+            function deleteBanner(id) {
+                if (confirm('Bạn có chắc chắn muốn xóa banner này?')) {
+                    banners = banners.filter(b => b.id !== id);
+                    localStorage.setItem('banners', JSON.stringify(banners));
+                    renderBanners();
+                }
+            }
+            
+            // Lưu banner
+            function saveBanner(e) {
+                e.preventDefault();
+                
+                const id = document.getElementById('banner-id').value;
+                const title = document.getElementById('banner-title').value;
+                const image = document.getElementById('banner-image').value;
+                const link = document.getElementById('banner-link').value;
+                const order = parseInt(document.getElementById('banner-order').value);
+                const status = document.getElementById('banner-status').value;
+                
+                if (id) {
+                    // Cập nhật banner
+                    const index = banners.findIndex(b => b.id === parseInt(id));
+                    if (index !== -1) {
+                        banners[index] = {
+                            ...banners[index],
+                            title,
+                            image,
+                            link,
+                            order,
+                            status
+                        };
+                    }
+                } else {
+                    // Thêm banner mới
+                    const newId = banners.length > 0 ? Math.max(...banners.map(b => b.id)) + 1 : 1;
+                    banners.push({
+                        id: newId,
+                        title,
+                        image,
+                        link,
+                        order,
+                        status
+                    });
+                }
+                
+                localStorage.setItem('banners', JSON.stringify(banners));
+                hideModal();
+                renderBanners();
+            }
+            
+            // Preview hình ảnh khi nhập URL
+            document.getElementById('banner-image').addEventListener('input', function() {
+                const imageUrl = this.value;
+                const imagePreview = document.getElementById('image-preview');
+                
+                if (imageUrl) {
+                    imagePreview.src = imageUrl;
+                    imagePreview.style.display = 'block';
+                    
+                    // Kiểm tra nếu hình ảnh không tải được
+                    imagePreview.onerror = function() {
+                        imagePreview.style.display = 'none';
+                    };
+                } else {
+                    imagePreview.style.display = 'none';
+                }
+            });
+            
+            // Event listeners
+            document.getElementById('add-banner-btn').addEventListener('click', addBanner);
+            document.getElementById('close-modal').addEventListener('click', hideModal);
+            document.getElementById('cancel-btn').addEventListener('click', hideModal);
+            document.getElementById('banner-form').addEventListener('submit', saveBanner);
+            
+            // Hiển thị danh sách banners khi trang được tải
+            renderBanners();
+        });
+    </script>
+</body>
+</html>
