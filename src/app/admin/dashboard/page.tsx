@@ -30,11 +30,64 @@ export default function Dashboard() {
     
     // Kiểm tra xem người dùng đã đăng nhập chưa
     if (typeof window !== 'undefined') {
-      const authData = localStorage.getItem('adminAuth');
+      // Kiểm tra xem localStorage có khả dụng không
+      const isLocalStorageAvailable = () => {
+        try {
+          const testKey = '__test__';
+          localStorage.setItem(testKey, testKey);
+          localStorage.removeItem(testKey);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+      
+      // Kiểm tra xem sessionStorage có khả dụng không
+      const isSessionStorageAvailable = () => {
+        try {
+          const testKey = '__test__';
+          sessionStorage.setItem(testKey, testKey);
+          sessionStorage.removeItem(testKey);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+      
+      // Kiểm tra cookie
+      const getCookieValue = (name) => {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+      };
+      
+      let authData = null;
+      
+      // Thử lấy từ localStorage nếu có thể
+      if (isLocalStorageAvailable()) {
+        authData = localStorage.getItem('adminAuth');
+        console.log('Auth data from localStorage:', authData ? 'Found' : 'Not found');
+      } else {
+        console.log('localStorage is not available (possibly in incognito mode)');
+        // Sử dụng cookie nếu localStorage không khả dụng
+        authData = getCookieValue('adminAuth');
+        console.log('Using cookie for auth:', authData ? 'Found' : 'Not found');
+      }
+      
       if (!authData) {
+        console.log('No auth data found, redirecting to login');
         // Thêm một flag để tránh chuyển hướng nhiều lần
-        if (!sessionStorage.getItem('redirecting')) {
-          sessionStorage.setItem('redirecting', 'true');
+        let redirectFlag = false;
+        
+        if (isSessionStorageAvailable()) {
+          redirectFlag = sessionStorage.getItem('redirecting');
+          if (!redirectFlag) {
+            sessionStorage.setItem('redirecting', 'true');
+          }
+        }
+        
+        if (!redirectFlag && !getCookieValue('redirecting')) {
+          // Sử dụng cookie làm flag nếu sessionStorage không khả dụng
+          document.cookie = 'redirecting=true; path=/; max-age=10'; // Chỉ tồn tại 10 giây
           window.location.href = '/admin/login';
         }
         return;
@@ -47,17 +100,38 @@ export default function Dashboard() {
         const expirationTime = 24 * 60 * 60 * 1000; // 24 giờ
         
         if (!isLoggedIn || now - timestamp > expirationTime) {
+          console.log('Auth expired or invalid');
           // Thêm một flag để tránh chuyển hướng nhiều lần
-          if (!sessionStorage.getItem('redirecting')) {
-            sessionStorage.setItem('redirecting', 'true');
+          let redirectFlag = false;
+          
+          if (isSessionStorageAvailable()) {
+            redirectFlag = sessionStorage.getItem('redirecting');
+            if (!redirectFlag) {
+              sessionStorage.setItem('redirecting', 'true');
+            }
+          }
+          
+          if (!redirectFlag && !getCookieValue('redirecting')) {
+            // Sử dụng cookie làm flag nếu sessionStorage không khả dụng
+            document.cookie = 'redirecting=true; path=/; max-age=10'; // Chỉ tồn tại 10 giây
             window.location.href = '/admin/login';
           }
         }
       } catch (err) {
         console.error('Error parsing auth data:', err);
         // Thêm một flag để tránh chuyển hướng nhiều lần
-        if (!sessionStorage.getItem('redirecting')) {
-          sessionStorage.setItem('redirecting', 'true');
+        let redirectFlag = false;
+        
+        if (isSessionStorageAvailable()) {
+          redirectFlag = sessionStorage.getItem('redirecting');
+          if (!redirectFlag) {
+            sessionStorage.setItem('redirecting', 'true');
+          }
+        }
+        
+        if (!redirectFlag && !getCookieValue('redirecting')) {
+          // Sử dụng cookie làm flag nếu sessionStorage không khả dụng
+          document.cookie = 'redirecting=true; path=/; max-age=10'; // Chỉ tồn tại 10 giây
           window.location.href = '/admin/login';
         }
       }
@@ -66,7 +140,13 @@ export default function Dashboard() {
     // Xóa flag redirecting khi component unmount
     return () => {
       if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('redirecting');
+        try {
+          sessionStorage.removeItem('redirecting');
+        } catch (e) {
+          console.log('sessionStorage is not available');
+        }
+        // Xóa cookie flag
+        document.cookie = 'redirecting=; path=/; max-age=0';
       }
     };
   }, []);

@@ -29,8 +29,49 @@ export default function AdminLayout({
       try {
         // Sử dụng window để đảm bảo chỉ chạy ở client-side
         if (typeof window !== 'undefined') {
-          const authData = localStorage.getItem('adminAuth');
-          console.log('Auth data from localStorage:', authData ? 'Found' : 'Not found');
+          // Kiểm tra xem localStorage có khả dụng không
+          const isLocalStorageAvailable = () => {
+            try {
+              const testKey = '__test__';
+              localStorage.setItem(testKey, testKey);
+              localStorage.removeItem(testKey);
+              return true;
+            } catch (e) {
+              return false;
+            }
+          };
+          
+          // Kiểm tra xem sessionStorage có khả dụng không
+          const isSessionStorageAvailable = () => {
+            try {
+              const testKey = '__test__';
+              sessionStorage.setItem(testKey, testKey);
+              sessionStorage.removeItem(testKey);
+              return true;
+            } catch (e) {
+              return false;
+            }
+          };
+          
+          // Kiểm tra cookie trước
+          const getCookieValue = (name) => {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            return match ? match[2] : null;
+          };
+          
+          const authCookie = getCookieValue('adminAuth');
+          let authData = null;
+          
+          // Thử lấy từ localStorage nếu có thể
+          if (isLocalStorageAvailable()) {
+            authData = localStorage.getItem('adminAuth');
+            console.log('Auth data from localStorage:', authData ? 'Found' : 'Not found');
+          } else {
+            console.log('localStorage is not available (possibly in incognito mode)');
+            // Sử dụng cookie nếu localStorage không khả dụng
+            authData = authCookie;
+            console.log('Using cookie for auth:', authData ? 'Found' : 'Not found');
+          }
 
           if (authData) {
             const parsedData = JSON.parse(authData);
@@ -46,7 +87,7 @@ export default function AdminLayout({
               console.log('Auth valid, setting logged in state');
               setIsLoggedIn(true);
 
-              // Cập nhật cookie để đồng bộ với middleware
+              // Cập nhật cookie để đồng bộ
               document.cookie = `adminAuth=${authData}; path=/; max-age=${expirationTime / 1000}`;
               return;
             } else {
@@ -58,9 +99,20 @@ export default function AdminLayout({
           // Chỉ chuyển hướng nếu không đang ở trang login và chưa chuyển hướng trước đó
           if (window.location.pathname !== '/admin/login') {
             console.log('Redirecting to login page');
+            
             // Thêm một flag để tránh chuyển hướng nhiều lần
-            if (!sessionStorage.getItem('redirecting')) {
-              sessionStorage.setItem('redirecting', 'true');
+            let redirectFlag = false;
+            
+            if (isSessionStorageAvailable()) {
+              redirectFlag = sessionStorage.getItem('redirecting');
+              if (!redirectFlag) {
+                sessionStorage.setItem('redirecting', 'true');
+              }
+            }
+            
+            if (!redirectFlag) {
+              // Sử dụng cookie làm flag nếu sessionStorage không khả dụng
+              document.cookie = 'redirecting=true; path=/; max-age=10'; // Chỉ tồn tại 10 giây
               window.location.href = '/admin/login';
             }
           }
@@ -79,14 +131,25 @@ export default function AdminLayout({
     // Xóa flag redirecting khi component unmount
     return () => {
       if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('redirecting');
+        try {
+          sessionStorage.removeItem('redirecting');
+        } catch (e) {
+          console.log('sessionStorage is not available');
+        }
+        // Xóa cookie flag
+        document.cookie = 'redirecting=; path=/; max-age=0';
       }
     };
   }, [pathname]);
 
   // Xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem('adminAuth');
+    try {
+      localStorage.removeItem('adminAuth');
+    } catch (e) {
+      console.log('localStorage is not available');
+    }
+    // Luôn xóa cookie
     document.cookie = 'adminAuth=; path=/; max-age=0';
     window.location.href = '/admin/login';
   };
