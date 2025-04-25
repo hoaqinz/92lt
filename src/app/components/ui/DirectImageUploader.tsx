@@ -51,27 +51,42 @@ export default function DirectImageUploader({
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
 
-      // Bước 1: Lấy URL tải lên trực tiếp từ server
-      console.log('Đang lấy URL tải lên trực tiếp...');
-      const response = await fetch('/api/get-upload-url');
+      // Bước 1: Lấy URL tải lên trực tiếp từ Cloudflare API
+      console.log('Đang lấy URL tải lên trực tiếp từ Cloudflare API...');
+      
+      // Thông tin xác thực Cloudflare (cập nhật)
+      const accountId = '04725e5acc15b760fb22bf197ff9799f';
+      const apiToken = 'JZYoQdkbYec97Na325HqQwEJAUn12Wh_tw6iUtPp';
+      
+      // Gọi trực tiếp đến Cloudflare API
+      const response = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v2/direct_upload`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiToken}`
+          },
+          body: JSON.stringify({
+            requireSignedURLs: false,
+            metadata: {
+              source: 'direct_client_upload'
+            }
+          })
+        }
+      );
       
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
         throw new Error(`Lỗi khi lấy URL tải lên: ${response.status} ${response.statusText}`);
       }
       
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-      
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error('Không thể parse JSON:', e);
-        throw new Error('Server trả về response không hợp lệ');
-      }
+      const data = await response.json();
+      console.log('Direct upload response:', data);
       
       if (!data.success || !data.result) {
-        throw new Error('Server trả về dữ liệu không hợp lệ');
+        throw new Error('Cloudflare API trả về dữ liệu không hợp lệ');
       }
       
       const uploadUrl = data.result;
