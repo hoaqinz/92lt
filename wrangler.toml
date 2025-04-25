@@ -10,8 +10,8 @@ CLOUDFLARE_ACCOUNT_HASH = "tJAHQehMkQM0pKlceH1PGg"
 CLOUDFLARE_IMAGE_DELIVERY_URL = "https://imagedelivery.net/tJAHQehMkQM0pKlceH1PGg"
 
 # Cấu hình bí mật
-[secrets]
-CLOUDFLARE_API_TOKEN
+[vars]
+# CLOUDFLARE_API_TOKEN được thiết lập trong Cloudflare dashboard
 
 # Cấu hình Functions
 [site]
@@ -24,3 +24,8 @@ command = "npm run build"
 [[routes]]
 pattern = "/api/upload"
 script = "api/upload.js"
+
+# API route đã được xóa vì không tương thích với static export
+# [[routes]]
+# pattern = "/api/get-upload-url"
+# script = "api/get-upload-url.js"
