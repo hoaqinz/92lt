@@ -31,10 +31,19 @@ async function uploadToCloudflareImages(file, accountId, apiToken) {
     
     // Gửi request đến Cloudflare Images API
     console.log('Gửi request đến Cloudflare Images API...');
-    const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v1`, {
+    
+    // Sử dụng CORS proxy khi ở môi trường development
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiUrl = isLocalhost
+      ? `https://cors-anywhere.herokuapp.com/https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v1`
+      : `https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v1`;
+    
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiToken}`
+        'Authorization': `Bearer ${apiToken}`,
+        // Thêm header cho CORS proxy
+        ...(isLocalhost ? { 'X-Requested-With': 'XMLHttpRequest' } : {})
       },
       body: formData
     });
