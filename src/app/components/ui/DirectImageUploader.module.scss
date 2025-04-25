@@ -1,0 +1,84 @@
+.imageUploader {
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.dropZone {
+  position: relative;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  
+  &:hover {
+    border-color: #e60000;
+  }
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  
+  svg {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.previewContainer {
+  position: relative;
+  
+  &:hover .overlay {
+    opacity: 1;
+  }
+}
+
+.preview {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 4px;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 4px;
+  
+  span {
+    color: white;
+    font-weight: 500;
+  }
+}
+
+.fileInput {
+  display: none;
+}
+
+.uploading {
+  margin-top: 0.5rem;
+  color: #0066cc;
+  font-weight: 500;
+}
+
+.error {
+  margin-top: 0.5rem;
+  color: #e60000;
+}

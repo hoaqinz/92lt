@@ -1,0 +1,60 @@
+'use client';
+
+import { useState } from 'react';
+import DirectImageUploader from '../components/ui/DirectImageUploader';
+import styles from './test-direct-uploader.module.scss';
+
+export default function TestDirectUploaderPage() {
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [error, setError] = useState<string>('');
+
+  const handleImageUpload = (url: string) => {
+    setImageUrl(url);
+    setUploadStatus('Tải ảnh lên thành công!');
+    setError('');
+  };
+
+  const handleUploadError = (errorMessage: string) => {
+    setError(errorMessage);
+    setUploadStatus('');
+  };
+
+  return (
+    <div className={styles.container}>
+      <h1>Kiểm tra DirectImageUploader</h1>
+      
+      <div className={styles.uploadSection}>
+        <h2>Tải ảnh lên sử dụng Direct Upload API</h2>
+        <p>
+          Component này sử dụng Cloudflare Direct Upload API, an toàn hơn vì không yêu cầu API token trên client.
+        </p>
+        <DirectImageUploader 
+          onImageUpload={handleImageUpload}
+          onError={handleUploadError}
+        />
+      </div>
+      
+      {uploadStatus && (
+        <div className={styles.successMessage}>
+          <p>{uploadStatus}</p>
+          <div className={styles.imagePreview}>
+            <img src={imageUrl} alt="Uploaded" />
+          </div>
+          <p>URL ảnh: <a href={imageUrl} target="_blank" rel="noopener noreferrer">{imageUrl}</a></p>
+        </div>
+      )}
+      
+      {error && (
+        <div className={styles.errorMessage}>
+          <p>Lỗi: {error}</p>
+        </div>
+      )}
+      
+      <div className={styles.debugInfo}>
+        <h3>Thông tin debug</h3>
+        <p>Để kiểm tra lỗi, mở Console trong Developer Tools (F12)</p>
+      </div>
+    </div>
+  );
+}
