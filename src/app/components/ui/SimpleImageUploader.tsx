@@ -22,6 +22,16 @@ export default function SimpleImageUploader({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Hàm chuyển đổi file thành Base64
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,8 +67,11 @@ export default function SimpleImageUploader({
       // Tạo độ trễ giả lập để mô phỏng quá trình tải lên
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Sử dụng URL xem trước thay vì URL từ Cloudflare Images
-      onImageUpload(previewUrl);
+      // Chuyển đổi file thành Base64
+      const base64Url = await convertFileToBase64(file);
+      
+      // Sử dụng URL Base64 thay vì URL blob
+      onImageUpload(base64Url);
       
       console.log('Tải lên thành công (giả lập)!');
     } catch (error) {
