@@ -128,7 +128,7 @@
   }
   
   &:hover {
-    color: lighten(#ff0000, 10%);
+    color: #ff3333; /* Thay thế lighten(#ff0000, 10%) */
     
     svg {
       transform: translateX(3px);

@@ -1,8 +1,5 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import styles from './page.module.scss';
 
 // Dữ liệu mẫu cho các bài viết blog
@@ -202,9 +199,15 @@ const blogPosts = [
   }
 ];
 
-export default function BlogPostPage() {
-  const params = useParams();
-  const postId = params.id as string;
+// Hàm này cần thiết cho static export với dynamic routes
+export function generateStaticParams() {
+  return blogPosts.map(post => ({
+    id: post.id,
+  }));
+}
+
+export default function BlogPostPage({ params }: { params: { id: string } }) {
+  const postId = params.id;
   
   // Tìm bài viết theo ID
   const post = blogPosts.find(post => post.id === postId);

@@ -186,7 +186,7 @@
   transition: background-color 0.2s;
   
   &:hover {
-    background-color: darken(#ff0000, 10%);
+    background-color: #cc0000; /* Thay thế darken(#ff0000, 10%) */
   }
 }
 
