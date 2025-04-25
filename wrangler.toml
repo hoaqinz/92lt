@@ -1,6 +1,7 @@
 # Cấu hình Cloudflare Pages
 name = "92lt"
 compatibility_date = "2023-10-30"
+compatibility_flags = ["nodejs_compat"]
 
 # Cấu hình biến môi trường
 [vars]
@@ -11,3 +12,15 @@ CLOUDFLARE_IMAGE_DELIVERY_URL = "https://imagedelivery.net/tJAHQehMkQM0pKlceH1PG
 # Cấu hình bí mật
 [secrets]
 CLOUDFLARE_API_TOKEN
+
+# Cấu hình Functions
+[site]
+bucket = "./out"
+
+[build]
+command = "npm run build"
+
+# Cấu hình Routes
+[[routes]]
+pattern = "/api/upload"
+script = "api/upload.js"
