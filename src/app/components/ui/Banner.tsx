@@ -4,11 +4,24 @@ import { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import styles from './Banner.module.scss';
 
-interface BannerItem {
-  id: string;
-  image: string;
-  link: string;
+// Định nghĩa kiểu dữ liệu cho banner từ admin
+interface AdminBanner {
+  id: number;
   title: string;
+  image: string;
+  link?: string;
+  buttonText?: string;
+  order: number;
+  status: 'active' | 'inactive';
+}
+
+// Định nghĩa kiểu dữ liệu cho banner trong component
+interface BannerItem {
+  id: string | number;
+  image: string;
+  link?: string;
+  title: string;
+  buttonText?: string;
   active: boolean;
 }
 
@@ -29,6 +42,7 @@ const Banner = ({ banners: propBanners }: BannerProps) => {
     image: banner.image,
     link: '#',
     title: banner.title,
+    buttonText: banner.buttonText,
     active: true
   })) : [];
 
@@ -45,20 +59,51 @@ const Banner = ({ banners: propBanners }: BannerProps) => {
     if (!isClient) return;
 
     try {
-      // Lấy dữ liệu từ localStorage
-      const storedBanners = JSON.parse(localStorage.getItem('siteBanners') || '[]');
+      // Lấy dữ liệu từ localStorage - sử dụng key 'banners' từ admin
+      const storedBannersString = localStorage.getItem('banners');
+      
+      if (storedBannersString) {
+        console.log('Loaded banners from localStorage:', storedBannersString);
+        
+        const storedBanners = JSON.parse(storedBannersString) as AdminBanner[];
+        
+        // Chuyển đổi từ định dạng admin sang định dạng component
+        const convertedBanners: BannerItem[] = storedBanners
+          .filter(banner => banner.status === 'active')
+          .map(banner => ({
+            id: banner.id,
+            image: banner.image,
+            link: banner.link,
+            title: banner.title,
+            buttonText: banner.buttonText,
+            active: true
+          }))
+          .sort((a, b) => {
+            // Sắp xếp theo thứ tự của banner gốc
+            const aIndex = storedBanners.findIndex(banner => banner.id === a.id);
+            const bIndex = storedBanners.findIndex(banner => banner.id === b.id);
+            return aIndex - bIndex;
+          });
 
-      // Lọc các banner đang active
-      const activeBanners = storedBanners.filter((banner: BannerItem) => banner.active);
-
-      if (activeBanners.length > 0) {
-        setBanners(activeBanners);
+        if (convertedBanners.length > 0) {
+          console.log('Using banners from admin:', convertedBanners);
+          setBanners(convertedBanners);
+        } else if (defaultBanners.length > 0) {
+          console.log('No active banners found, using default banners');
+          setBanners(defaultBanners);
+        }
+      } else if (defaultBanners.length > 0) {
+        console.log('No banners in localStorage, using default banners');
+        setBanners(defaultBanners);
       }
     } catch (err) {
       console.error('Error loading banners from localStorage:', err);
       // Giữ nguyên dữ liệu mặc định nếu có lỗi
+      if (defaultBanners.length > 0) {
+        setBanners(defaultBanners);
+      }
     }
-  }, [isClient]);
+  }, [isClient, defaultBanners]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
@@ -78,7 +123,7 @@ const Banner = ({ banners: propBanners }: BannerProps) => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [currentSlide]);
+  }, [currentSlide, banners.length]);
 
   // Nếu không có banner nào, không hiển thị gì cả
   if (banners.length === 0) {
@@ -107,6 +152,9 @@ const Banner = ({ banners: propBanners }: BannerProps) => {
                       <h2>
                         <span>{banner.title.split(' ')[0]}</span> {banner.title.split(' ').slice(1).join(' ')}
                       </h2>
+                      {banner.buttonText && (
+                        <button className={styles.bannerButton}>{banner.buttonText}</button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -124,6 +172,9 @@ const Banner = ({ banners: propBanners }: BannerProps) => {
                       <h2>
                         <span>{banner.title.split(' ')[0]}</span> {banner.title.split(' ').slice(1).join(' ')}
                       </h2>
+                      {banner.buttonText && (
+                        <button className={styles.bannerButton}>{banner.buttonText}</button>
+                      )}
                     </div>
                   </div>
                 )}

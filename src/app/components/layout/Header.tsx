@@ -69,6 +69,11 @@ const Header = () => {
                   Phổ biến
                 </Link>
               </li>
+              <li className={styles.navItem}>
+                <Link href="/posts" className={`${styles.navLink} ${activeTab === 'posts' ? styles.active : ''}`}>
+                  Tin tức
+                </Link>
+              </li>
             </ul>
           </nav>
 
