@@ -8,9 +8,6 @@ compatibility_flags = ["nodejs_compat"]
 CLOUDFLARE_ACCOUNT_ID = "04725e5acc15b760fb22bf197ff9799f"
 CLOUDFLARE_ACCOUNT_HASH = "tJAHQehMkQM0pKlceH1PGg"
 CLOUDFLARE_IMAGE_DELIVERY_URL = "https://imagedelivery.net/tJAHQehMkQM0pKlceH1PGg"
-
-# Cấu hình bí mật
-[vars]
 # CLOUDFLARE_API_TOKEN được thiết lập trong Cloudflare dashboard
 
 # Cấu hình Functions
