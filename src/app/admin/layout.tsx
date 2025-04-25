@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { FaTachometerAlt, FaSignOutAlt, FaPlus, FaList, FaImage, FaLink, FaGift } from 'react-icons/fa';
+import { FaTachometerAlt, FaSignOutAlt, FaPlus, FaList, FaImage, FaLink, FaGift, FaNewspaper } from 'react-icons/fa';
 import './admin.scss';
 
 export default function AdminLayout({
@@ -13,9 +13,12 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   // Kiểm tra trạng thái đăng nhập khi component được mount
   useEffect(() => {
+    setIsClient(true);
+    
     // Bỏ qua kiểm tra nếu đang ở trang đăng nhập
     if (pathname === '/admin/login') {
       return;
@@ -52,10 +55,14 @@ export default function AdminLayout({
           }
 
           // Nếu không đăng nhập hoặc đã hết hạn, chuyển hướng đến trang đăng nhập
-          // Chỉ chuyển hướng nếu không đang ở trang login
+          // Chỉ chuyển hướng nếu không đang ở trang login và chưa chuyển hướng trước đó
           if (window.location.pathname !== '/admin/login') {
             console.log('Redirecting to login page');
-            window.location.href = '/admin/login';
+            // Thêm một flag để tránh chuyển hướng nhiều lần
+            if (!sessionStorage.getItem('redirecting')) {
+              sessionStorage.setItem('redirecting', 'true');
+              window.location.href = '/admin/login';
+            }
           }
         }
       } catch (error) {
@@ -68,103 +75,98 @@ export default function AdminLayout({
     };
 
     checkAuth();
+    
+    // Xóa flag redirecting khi component unmount
+    return () => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('redirecting');
+      }
+    };
   }, [pathname]);
 
   // Xử lý đăng xuất
   const handleLogout = () => {
-    console.log('Logging out...');
     localStorage.removeItem('adminAuth');
     document.cookie = 'adminAuth=; path=/; max-age=0';
-
-    // Sử dụng window.location thay vì router để đảm bảo chuyển hướng hoạt động
     window.location.href = '/admin/login';
   };
 
   // Nếu đang ở trang đăng nhập, chỉ hiển thị nội dung con
-  if (pathname === '/admin/login') {
+  if (pathname === '/admin/login' || !isClient) {
     return <>{children}</>;
   }
 
-  // Nếu chưa đăng nhập và không phải trang đăng nhập, hiển thị loading
+  // Nếu chưa đăng nhập, hiển thị trang loading
   if (!isLoggedIn) {
-    return (
-      <div className="admin-loading">
-        <div className="spinner"></div>
-        <p>Đang tải...</p>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
-  // Hiển thị layout admin khi đã đăng nhập
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar">
-        <div className="admin-logo">
+      <div className="admin-sidebar">
+        <div className="sidebar-header">
           <h1>92LOTTERY</h1>
           <p>Admin Panel</p>
         </div>
-
-        <nav className="admin-nav">
-          <ul>
-            <li>
-              <Link href="/admin/dashboard" className={pathname === '/admin/dashboard' ? 'active' : ''}>
-                <FaTachometerAlt /> Dashboard
-              </Link>
-            </li>
-            <li className="nav-section-title">Bài viết</li>
-            <li>
-              <Link href="/admin/posts" className={pathname === '/admin/posts' ? 'active' : ''}>
-                <FaList /> Danh sách bài viết
-              </Link>
-            </li>
-            <li>
-              <Link href="/admin/posts/new" className={pathname === '/admin/posts/new' ? 'active' : ''}>
-                <FaPlus /> Thêm bài viết mới
-              </Link>
-            </li>
-            <li className="nav-section-title">Giao diện</li>
-            <li>
-              <Link href="/admin/banners" className={pathname === '/admin/banners' ? 'active' : ''}>
-                <FaImage /> Quản lý banner
-              </Link>
-            </li>
-            <li>
-              <Link href="/admin/icons" className={pathname === '/admin/icons' ? 'active' : ''}>
-                <FaLink /> Quản lý icon & liên kết
-              </Link>
-            </li>
-            <li>
-              <Link href="/admin/promotions" className={pathname === '/admin/promotions' ? 'active' : ''}>
-                <FaGift /> Quản lý khuyến mãi
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <div className="admin-sidebar-footer">
-          <button onClick={handleLogout} className="logout-button">
+        
+        <ul className="sidebar-menu">
+          <li>
+            <Link href="/admin/dashboard" className={pathname === '/admin/dashboard' ? 'active' : ''}>
+              <FaTachometerAlt /> Dashboard
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/posts" className={pathname.startsWith('/admin/posts') ? 'active' : ''}>
+              <FaNewspaper /> Bài viết
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/banners" className={pathname === '/admin/banners' ? 'active' : ''}>
+              <FaImage /> Banners
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/icons" className={pathname === '/admin/icons' ? 'active' : ''}>
+              <FaLink /> Icons
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/promotions" className={pathname === '/admin/promotions' ? 'active' : ''}>
+              <FaGift /> Khuyến mãi
+            </Link>
+          </li>
+        </ul>
+        
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={handleLogout}>
             <FaSignOutAlt /> Đăng xuất
           </button>
         </div>
-      </aside>
-
-      <main className="admin-content">
-        <header className="admin-header">
-          <h2>
+      </div>
+      
+      <div className="admin-content">
+        <div className="admin-header">
+          <div className="header-title">
             {pathname === '/admin/dashboard' && 'Dashboard'}
             {pathname === '/admin/posts' && 'Quản lý bài viết'}
-            {pathname === '/admin/posts/new' && 'Thêm bài viết mới'}
-            {pathname.startsWith('/admin/posts/edit/') && 'Chỉnh sửa bài viết'}
-            {pathname === '/admin/banners' && 'Quản lý banner'}
-            {pathname === '/admin/icons' && 'Quản lý icon & liên kết'}
+            {pathname.startsWith('/admin/posts/new') && 'Thêm bài viết mới'}
+            {pathname.startsWith('/admin/posts/edit') && 'Chỉnh sửa bài viết'}
+            {pathname === '/admin/banners' && 'Quản lý banners'}
+            {pathname === '/admin/icons' && 'Quản lý icons'}
             {pathname === '/admin/promotions' && 'Quản lý khuyến mãi'}
-          </h2>
-        </header>
-
-        <div className="admin-main-content">
+          </div>
+          
+          <div className="header-actions">
+            <button className="logout-btn" onClick={handleLogout}>
+              <FaSignOutAlt /> Đăng xuất
+            </button>
+          </div>
+        </div>
+        
+        <div className="admin-main">
           {children}
         </div>
-      </main>
+      </div>
     </div>
   );
 }

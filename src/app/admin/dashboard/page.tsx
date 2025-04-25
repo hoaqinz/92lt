@@ -1,149 +1,116 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaNewspaper, FaEye, FaEdit, FaCalendarAlt } from 'react-icons/fa';
 import styles from './dashboard.module.scss';
 
-export default function AdminDashboard() {
-  const [stats, setStats] = useState({
-    totalPosts: 0,
-    recentPosts: [],
-    totalViews: 0
-  });
+// Dữ liệu mẫu cho thống kê
+const defaultStats = {
+  posts: 12,
+  banners: 5,
+  icons: 24,
+  promotions: 8
+};
 
-  // Dữ liệu mẫu mặc định
-  const defaultStats = {
-    totalPosts: 4,
-    recentPosts: [
-      {
-        id: 'post-1',
-        title: 'Hướng dẫn cách chơi Win Go hiệu quả nhất',
-        date: '15/07/2023',
-        views: 1250
-      },
-      {
-        id: 'post-2',
-        title: 'Top 10 game Slots được yêu thích nhất tháng 7/2023',
-        date: '10/07/2023',
-        views: 980
-      },
-      {
-        id: 'post-3',
-        title: 'Cách quản lý vốn hiệu quả khi chơi Casino trực tuyến',
-        date: '05/07/2023',
-        views: 820
-      },
-      {
-        id: 'post-4',
-        title: 'Những sai lầm phổ biến khi chơi Bắn Cá và cách tránh',
-        date: '01/07/2023',
-        views: 750
-      }
-    ],
-    totalViews: 3800
-  };
+// Dữ liệu mẫu cho hoạt động gần đây
+const defaultActivities = [
+  { id: 1, time: 'Hôm nay, 10:30', description: 'Thêm mới banner "Khuyến mãi tháng 4"' },
+  { id: 2, time: 'Hôm nay, 09:15', description: 'Cập nhật bài viết "Hướng dẫn đăng ký tài khoản"' },
+  { id: 3, time: 'Hôm qua, 16:45', description: 'Thêm mới icon "WinGo"' },
+  { id: 4, time: 'Hôm qua, 14:20', description: 'Cập nhật khuyến mãi "Thưởng nạp lần đầu"' },
+  { id: 5, time: '22/04/2023, 11:05', description: 'Thêm mới bài viết "Top 5 game được yêu thích nhất"' }
+];
 
+export default function Dashboard() {
+  const [stats, setStats] = useState(defaultStats);
+  const [activities, setActivities] = useState(defaultActivities);
   const [isClient, setIsClient] = useState(false);
 
-  // Đánh dấu khi component được mount ở client-side
   useEffect(() => {
     setIsClient(true);
-    setStats(defaultStats); // Khởi tạo với dữ liệu mẫu
+    
+    // Kiểm tra xem người dùng đã đăng nhập chưa
+    if (typeof window !== 'undefined') {
+      const authData = localStorage.getItem('adminAuth');
+      if (!authData) {
+        // Thêm một flag để tránh chuyển hướng nhiều lần
+        if (!sessionStorage.getItem('redirecting')) {
+          sessionStorage.setItem('redirecting', 'true');
+          window.location.href = '/admin/login';
+        }
+        return;
+      }
+
+      try {
+        const parsedData = JSON.parse(authData);
+        const { isLoggedIn, timestamp } = parsedData;
+        const now = new Date().getTime();
+        const expirationTime = 24 * 60 * 60 * 1000; // 24 giờ
+        
+        if (!isLoggedIn || now - timestamp > expirationTime) {
+          // Thêm một flag để tránh chuyển hướng nhiều lần
+          if (!sessionStorage.getItem('redirecting')) {
+            sessionStorage.setItem('redirecting', 'true');
+            window.location.href = '/admin/login';
+          }
+        }
+      } catch (err) {
+        console.error('Error parsing auth data:', err);
+        // Thêm một flag để tránh chuyển hướng nhiều lần
+        if (!sessionStorage.getItem('redirecting')) {
+          sessionStorage.setItem('redirecting', 'true');
+          window.location.href = '/admin/login';
+        }
+      }
+    }
+    
+    // Xóa flag redirecting khi component unmount
+    return () => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('redirecting');
+      }
+    };
   }, []);
 
-  // Lấy dữ liệu từ localStorage khi ở client-side
-  useEffect(() => {
-    if (!isClient) return;
-
-    try {
-      // Lấy dữ liệu từ localStorage
-      const storedPosts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
-
-      if (storedPosts.length === 0) return;
-
-      // Tính tổng lượt xem
-      const totalViews = storedPosts.reduce((sum: number, post: any) => sum + (post.views || 0), 0);
-
-      // Sắp xếp bài viết theo ngày (mới nhất trước)
-      const sortedPosts = [...storedPosts].sort((a: any, b: any) => {
-        const dateA = new Date(a.date.split('/').reverse().join('-'));
-        const dateB = new Date(b.date.split('/').reverse().join('-'));
-        return dateB.getTime() - dateA.getTime();
-      });
-
-      // Lấy 4 bài viết mới nhất
-      const recentPosts = sortedPosts.slice(0, 4);
-
-      const stats = {
-        totalPosts: storedPosts.length,
-        recentPosts,
-        totalViews
-      };
-
-      setStats(stats);
-    } catch (err) {
-      console.error('Error loading stats:', err);
-    }
-  }, [isClient]);
+  if (!isClient) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className={styles.dashboard}>
-      <div className={styles.statsGrid}>
-        <div className={`${styles.statCard} ${styles.posts}`}>
-          <div className={styles.statIcon}>
-            <FaNewspaper />
-          </div>
-          <div className={styles.statInfo}>
-            <h3>Tổng số bài viết</h3>
-            <p>{stats.totalPosts}</p>
-          </div>
+    <div className={styles.dashboardContainer}>
+      <h1 className={styles.pageTitle}>Dashboard</h1>
+      
+      <div className={styles.statsContainer}>
+        <div className={styles.statCard}>
+          <h3>Tổng số bài viết</h3>
+          <div className={styles.statValue}>{stats.posts}</div>
         </div>
-
-        <div className={`${styles.statCard} ${styles.views}`}>
-          <div className={styles.statIcon}>
-            <FaEye />
-          </div>
-          <div className={styles.statInfo}>
-            <h3>Tổng lượt xem</h3>
-            <p>{stats.totalViews}</p>
-          </div>
+        
+        <div className={styles.statCard}>
+          <h3>Banners hoạt động</h3>
+          <div className={styles.statValue}>{stats.banners}</div>
+        </div>
+        
+        <div className={styles.statCard}>
+          <h3>Icons</h3>
+          <div className={styles.statValue}>{stats.icons}</div>
+        </div>
+        
+        <div className={styles.statCard}>
+          <h3>Khuyến mãi</h3>
+          <div className={styles.statValue}>{stats.promotions}</div>
         </div>
       </div>
-
-      <div className="admin-card">
-        <h3>Bài viết gần đây</h3>
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Tiêu đề</th>
-              <th>Ngày đăng</th>
-              <th>Lượt xem</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stats.recentPosts.map((post) => (
-              <tr key={post.id}>
-                <td>{post.title}</td>
-                <td>
-                  <span className={styles.dateCell}>
-                    <FaCalendarAlt /> {post.date}
-                  </span>
-                </td>
-                <td>
-                  <span className={styles.viewsCell}>
-                    <FaEye /> {post.views}
-                  </span>
-                </td>
-                <td className="actions">
-                  <button className="edit" onClick={() => window.location.href = `/admin/posts/edit/${post.id}`}>
-                    <FaEdit /> Sửa
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      
+      <div className={styles.recentActivity}>
+        <h2>Hoạt động gần đây</h2>
+        <ul className={styles.activityList}>
+          {activities.map(activity => (
+            <li key={activity.id} className={styles.activityItem}>
+              <div className={styles.activityTime}>{activity.time}</div>
+              <div className={styles.activityDescription}>{activity.description}</div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
