@@ -1,7 +1,4 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import React from 'react';
 import Link from 'next/link';
 import styles from './post.module.scss';
 
@@ -20,59 +17,64 @@ interface Post {
   status: 'draft' | 'published';
 }
 
-export default function PostDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const slug = params.slug as string;
-  
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
+// Dữ liệu mẫu cho các bài viết
+const samplePosts: Post[] = [
+  {
+    id: 1,
+    title: 'Hướng dẫn cách chơi Win Go hiệu quả nhất',
+    slug: 'huong-dan-choi-win-go',
+    content: '<p>Win Go là một trong những trò chơi xổ số phổ biến nhất tại 92LOTTERY...</p>',
+    excerpt: 'Tìm hiểu các chiến thuật và mẹo chơi Win Go để tăng cơ hội chiến thắng của bạn.',
+    featuredImage: 'https://via.placeholder.com/1200x600/1a1a1a/ff0000?text=Win+Go+Guide',
+    category: 'Hướng dẫn',
+    author: 'Admin',
+    createdAt: '2023-07-15T00:00:00Z',
+    updatedAt: '2023-07-15T00:00:00Z',
+    status: 'published'
+  },
+  {
+    id: 2,
+    title: 'Top 10 game Slots được yêu thích nhất tháng 7/2023',
+    slug: 'top-10-game-slots',
+    content: '<p>Slots là một trong những thể loại game casino phổ biến nhất tại 92LOTTERY...</p>',
+    excerpt: 'Khám phá những game Slots hot nhất và được người chơi yêu thích trong tháng này.',
+    featuredImage: 'https://via.placeholder.com/1200x600/1a1a1a/ffcc00?text=Top+Slots',
+    category: 'Tin tức',
+    author: 'Admin',
+    createdAt: '2023-07-10T00:00:00Z',
+    updatedAt: '2023-07-10T00:00:00Z',
+    status: 'published'
+  }
+];
 
-  useEffect(() => {
-    // Lấy dữ liệu bài viết từ localStorage
-    try {
-      const savedPosts = localStorage.getItem('posts');
-      if (savedPosts) {
-        const parsedPosts = JSON.parse(savedPosts) as Post[];
-        
-        // Tìm bài viết theo slug
-        const foundPost = parsedPosts.find(p => p.slug === slug && p.status === 'published');
-        
-        if (foundPost) {
-          setPost(foundPost);
-          
-          // Tìm các bài viết liên quan (cùng danh mục)
-          const related = parsedPosts
-            .filter(p => p.category === foundPost.category && p.id !== foundPost.id && p.status === 'published')
-            .slice(0, 3);
-          
-          setRelatedPosts(related);
-        } else {
-          // Nếu không tìm thấy bài viết, chuyển hướng về trang danh sách
-          router.push('/posts');
-        }
-      }
-    } catch (error) {
-      console.error('Error loading post:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [slug, router]);
+// Hàm này cần thiết cho static export với dynamic routes
+export function generateStaticParams() {
+  // Trong môi trường build, trả về danh sách các slug từ dữ liệu mẫu
+  return samplePosts.map(post => ({
+    slug: post.slug,
+  }));
+}
+
+export default function PostDetailPage({ params }: { params: { slug: string } }) {
+  const slug = params.slug;
+
+  // Tìm bài viết theo slug từ dữ liệu mẫu
+  const post = samplePosts.find(p => p.slug === slug);
+  
+  // Tìm các bài viết liên quan (cùng danh mục)
+  const relatedPosts = post 
+    ? samplePosts.filter(p => p.category === post.category && p.id !== post.id)
+    : [];
 
   // Format ngày tháng
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
+    return new Intl.DateTimeFormat('vi-VN', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
-    });
+    }).format(date);
   };
-
-  if (isLoading) {
-    return <div className={styles.loading}>Đang tải...</div>;
-  }
 
   if (!post) {
     return (
