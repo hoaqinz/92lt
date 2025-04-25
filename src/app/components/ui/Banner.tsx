@@ -142,19 +142,17 @@ const Banner = ({ banners: propBanners }: BannerProps) => {
             {banner.link ? (
               <a
                 href={banner.link}
-                className={`${styles.bannerLink} ${banner.title ? styles.hasTitle : ''}`}
+                className={styles.bannerLink}
                 style={{ backgroundImage: `url(${banner.image})` }}
               >
-                {/* Nội dung banner chỉ hiển thị nếu có title */}
-                {banner.title && (
+                {/* Nội dung banner chỉ hiển thị nếu có cả title và buttonText */}
+                {banner.title && banner.buttonText && (
                   <div className="container">
                     <div className={styles.bannerContent}>
                       <h2>
                         <span>{banner.title.split(' ')[0]}</span> {banner.title.split(' ').slice(1).join(' ')}
                       </h2>
-                      {banner.buttonText && (
-                        <button className={styles.bannerButton}>{banner.buttonText}</button>
-                      )}
+                      <button className={styles.bannerButton}>{banner.buttonText}</button>
                     </div>
                   </div>
                 )}
@@ -162,19 +160,17 @@ const Banner = ({ banners: propBanners }: BannerProps) => {
             ) : (
               // Nếu không có link, chỉ hiển thị hình ảnh
               <div
-                className={`${styles.bannerImage} ${banner.title ? styles.hasTitle : ''}`}
+                className={styles.bannerImage}
                 style={{ backgroundImage: `url(${banner.image})` }}
               >
-                {/* Nội dung banner chỉ hiển thị nếu có title */}
-                {banner.title && (
+                {/* Nội dung banner chỉ hiển thị nếu có cả title và buttonText */}
+                {banner.title && banner.buttonText && (
                   <div className="container">
                     <div className={styles.bannerContent}>
                       <h2>
                         <span>{banner.title.split(' ')[0]}</span> {banner.title.split(' ').slice(1).join(' ')}
                       </h2>
-                      {banner.buttonText && (
-                        <button className={styles.bannerButton}>{banner.buttonText}</button>
-                      )}
+                      <button className={styles.bannerButton}>{banner.buttonText}</button>
                     </div>
                   </div>
                 )}

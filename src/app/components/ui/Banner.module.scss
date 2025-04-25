@@ -42,28 +42,6 @@
   display: flex;
   align-items: center;
   text-decoration: none;
-
-  // Chỉ hiển thị overlay khi có title
-  &.hasTitle::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(18, 18, 18, 0.9) 0%, rgba(18, 18, 18, 0.7) 50%, rgba(18, 18, 18, 0.4) 100%);
-  }
-
-  &.hasTitle::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 62, 62, 0.1) 0%, transparent 70%);
-    z-index: 0;
-  }
 }
 
 .bannerContent {
@@ -73,6 +51,9 @@
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.8s ease-out 0.3s;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 20px;
+  border-radius: 8px;
 
   .active & {
     opacity: 1;
