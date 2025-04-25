@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
+export const dynamic = 'force-static';
+
 export async function POST(request: NextRequest) {
   try {
     // Lấy thông tin từ environment variables
@@ -32,6 +34,14 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    // Tạo FormData mới cho request
+    const formDataForUpload = new FormData();
+    formDataForUpload.append('file', new Blob([buffer]), file.name);
+    formDataForUpload.append('id', imageId);
+    formDataForUpload.append('metadata', JSON.stringify({
+      uploadedFrom: '92lottery-admin'
+    }));
+    
     // Gửi request đến Cloudflare Images API
     const uploadResponse = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v1`,
@@ -40,7 +50,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'Authorization': `Bearer ${apiToken}`,
         },
-        body: createFormData(buffer, file.name, imageId),
+        body: formDataForUpload,
       }
     );
 
@@ -73,21 +83,31 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper function để tạo FormData
-function createFormData(buffer: Buffer, filename: string, id: string) {
-  const formData = new FormData();
-  
-  // Tạo Blob từ buffer
-  const blob = new Blob([buffer]);
-  
-  // Thêm file vào FormData
-  formData.append('file', blob, filename);
-  
-  // Thêm metadata
-  formData.append('id', id);
-  formData.append('metadata', JSON.stringify({
-    uploadedFrom: '92lottery-admin'
-  }));
-  
-  return formData;
+// Thêm API endpoint để lấy thông tin Cloudflare
+export async function GET() {
+  try {
+    const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+    const accountHash = process.env.CLOUDFLARE_ACCOUNT_HASH || '';
+    
+    if (!accountId || !accountHash) {
+      return NextResponse.json(
+        { error: 'Cloudflare credentials not configured' },
+        { status: 500 }
+      );
+    }
+    
+    return NextResponse.json({
+      success: true,
+      result: {
+        deliveryUrl: `https://imagedelivery.net/${accountHash}`,
+        accountId
+      }
+    });
+  } catch (error) {
+    console.error('Error getting Cloudflare info:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }
