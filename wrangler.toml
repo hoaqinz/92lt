@@ -1,0 +1,13 @@
+# Cấu hình Cloudflare Pages
+name = "92lt"
+compatibility_date = "2023-10-30"
+
+# Cấu hình biến môi trường
+[vars]
+CLOUDFLARE_ACCOUNT_ID = "04725e5acc15b760fb22bf197ff9799f"
+CLOUDFLARE_ACCOUNT_HASH = "tJAHQehMkQM0pKlceH1PGg"
+CLOUDFLARE_IMAGE_DELIVERY_URL = "https://imagedelivery.net/tJAHQehMkQM0pKlceH1PGg"
+
+# Cấu hình bí mật
+[secrets]
+CLOUDFLARE_API_TOKEN
