@@ -1,15 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { FaSave, FaArrowLeft } from 'react-icons/fa';
 import styles from './editor.module.scss';
-import CloudflareImageUploader from '@/app/components/ui/CloudflareImageUploader';
-
-// Import React Quill động để tránh lỗi SSR
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css';
+import DirectUploader from '@/app/components/ui/DirectUploader';
 
 // Định nghĩa kiểu dữ liệu cho bài viết
 interface Post {
@@ -36,18 +31,7 @@ export default function NewPostPage() {
   const [status, setStatus] = useState<'draft' | 'published'>('draft');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
-
-  // Cấu hình cho React Quill
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'color': [] }, { 'background': [] }],
-      ['link', 'image'],
-      ['clean']
-    ],
-  };
+  const [success, setSuccess] = useState('');
 
   // Tạo slug từ tiêu đề
   const createSlug = (text: string) => {
@@ -66,9 +50,10 @@ export default function NewPostPage() {
   };
 
   // Lưu bài viết
-  const handleSavePost = async (e: React.FormEvent) => {
+  const handleSavePost = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setIsSaving(true);
 
     try {
@@ -94,33 +79,17 @@ export default function NewPostPage() {
         status
       };
 
-      try {
-        // Gửi request đến API để lưu bài viết
-        const response = await fetch('/api/posts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newPost),
-        });
+      // Lưu vào localStorage
+      const existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+      const updatedPosts = [newPost, ...existingPosts];
+      localStorage.setItem('posts', JSON.stringify(updatedPosts));
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Lỗi khi lưu bài viết');
-        }
-      } catch (apiError) {
-        console.error('API Error:', apiError);
+      setSuccess('Bài viết đã được lưu thành công!');
 
-        // Fallback: Sử dụng localStorage nếu API không hoạt động
-        const existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-        const updatedPosts = [newPost, ...existingPosts];
-        localStorage.setItem('posts', JSON.stringify(updatedPosts));
-      }
-
-      // Chuyển hướng đến trang danh sách bài viết
+      // Chuyển hướng đến trang danh sách bài viết sau 1 giây
       setTimeout(() => {
         router.push('/admin/posts');
-      }, 500);
+      }, 1000);
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -133,8 +102,15 @@ export default function NewPostPage() {
     }
   };
 
+  const categories = [
+    { id: 'news', name: 'Tin tức' },
+    { id: 'guide', name: 'Hướng dẫn' },
+    { id: 'promotion', name: 'Khuyến mãi' },
+    { id: 'event', name: 'Sự kiện' }
+  ];
+
   return (
-    <div className={styles.editorPage}>
+    <div className={styles.editor}>
       <div className={styles.header}>
         <button
           className={styles.backButton}
@@ -151,9 +127,10 @@ export default function NewPostPage() {
         </button>
       </div>
 
-      {error && <div className={styles.errorMessage}>{error}</div>}
+      {error && <div className={styles.error}>{error}</div>}
+      {success && <div className={styles.success}>{success}</div>}
 
-      <form className={styles.editorForm}>
+      <form className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="title">Tiêu đề</label>
           <input
@@ -178,11 +155,16 @@ export default function NewPostPage() {
         </div>
 
         <div className={styles.formGroup}>
-          <CloudflareImageUploader
-            initialImage={featuredImage}
-            onImageUpload={handleImageUpload}
-            label="Ảnh đại diện"
+          <label>Ảnh đại diện</label>
+          <DirectUploader
+            onUploadComplete={handleImageUpload}
+            className={styles.uploader}
           />
+          {featuredImage && (
+            <div className={styles.imagePreview}>
+              <img src={featuredImage} alt="Featured" />
+            </div>
+          )}
         </div>
 
         <div className={styles.formGroup}>
@@ -191,11 +173,14 @@ export default function NewPostPage() {
             id="category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
+            required
           >
-            <option value="news">Tin tức</option>
-            <option value="guide">Hướng dẫn</option>
-            <option value="promotion">Khuyến mãi</option>
-            <option value="event">Sự kiện</option>
+            <option value="">-- Chọn danh mục --</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -213,15 +198,14 @@ export default function NewPostPage() {
 
         <div className={styles.formGroup}>
           <label htmlFor="content">Nội dung</label>
-          <div className={styles.editorContainer}>
-            <ReactQuill
-              value={content}
-              onChange={setContent}
-              modules={modules}
-              placeholder="Nhập nội dung bài viết..."
-              theme="snow"
-            />
-          </div>
+          <textarea
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={15}
+            required
+            placeholder="Nhập nội dung bài viết..."
+          />
         </div>
       </form>
     </div>

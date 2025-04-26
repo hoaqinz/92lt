@@ -31,67 +31,34 @@ export default function PostsPage() {
     setIsClient(true);
   }, []);
 
-  // Lấy danh sách bài viết từ API hoặc localStorage
+  // Lấy danh sách bài viết từ localStorage
   useEffect(() => {
     if (!isClient) return;
 
-    const fetchPosts = async () => {
-      try {
-        setIsLoading(true);
-
-        // Thử lấy dữ liệu từ API
-        try {
-          const response = await fetch('/api/posts');
-
-          if (response.ok) {
-            const data = await response.json();
-            setPosts(data);
-            return;
-          }
-        } catch (apiError) {
-          console.error('API Error:', apiError);
-        }
-
-        // Fallback: Sử dụng localStorage nếu API không hoạt động
-        const savedPosts = localStorage.getItem('posts');
-        if (savedPosts) {
-          const parsedPosts = JSON.parse(savedPosts);
-          setPosts(parsedPosts);
-        }
-      } catch (err) {
-        console.error('Error loading posts:', err);
-        setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi tải bài viết');
-      } finally {
-        setIsLoading(false);
+    try {
+      setIsLoading(true);
+      // Lấy dữ liệu từ localStorage
+      const savedPosts = localStorage.getItem('posts');
+      if (savedPosts) {
+        const parsedPosts = JSON.parse(savedPosts);
+        setPosts(parsedPosts);
       }
-    };
-
-    fetchPosts();
+    } catch (err) {
+      console.error('Error loading posts:', err);
+      setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi tải bài viết');
+    } finally {
+      setIsLoading(false);
+    }
   }, [isClient]);
 
   // Xóa bài viết
-  const handleDeletePost = async (id: number) => {
+  const handleDeletePost = (id: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
       return;
     }
 
     try {
-      // Thử xóa bài viết qua API
-      try {
-        const response = await fetch(`/api/posts-by-id/${id}`, {
-          method: 'DELETE',
-        });
-
-        if (response.ok) {
-          // Cập nhật state
-          setPosts(posts.filter(post => post.id !== id));
-          return;
-        }
-      } catch (apiError) {
-        console.error('API Error:', apiError);
-      }
-
-      // Fallback: Sử dụng localStorage nếu API không hoạt động
+      // Lấy dữ liệu từ localStorage
       const savedPosts = localStorage.getItem('posts');
       if (savedPosts) {
         const parsedPosts = JSON.parse(savedPosts);
@@ -109,33 +76,15 @@ export default function PostsPage() {
   };
 
   // Thay đổi trạng thái bài viết
-  const handleToggleStatus = async (post: Post) => {
+  const handleToggleStatus = (post: Post) => {
     try {
       const updatedPost = {
         ...post,
         status: post.status === 'published' ? 'draft' : 'published',
+        updatedAt: new Date().toISOString()
       };
 
-      // Thử cập nhật bài viết qua API
-      try {
-        const response = await fetch(`/api/posts-by-id/${post.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedPost),
-        });
-
-        if (response.ok) {
-          // Cập nhật state
-          setPosts(posts.map(p => p.id === post.id ? updatedPost : p));
-          return;
-        }
-      } catch (apiError) {
-        console.error('API Error:', apiError);
-      }
-
-      // Fallback: Sử dụng localStorage nếu API không hoạt động
+      // Lấy dữ liệu từ localStorage
       const savedPosts = localStorage.getItem('posts');
       if (savedPosts) {
         const parsedPosts = JSON.parse(savedPosts);

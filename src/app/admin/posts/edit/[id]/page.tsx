@@ -22,30 +22,34 @@ export default function EditPost({ params }: { params: { id: string } }) {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await fetch(`/api/posts/${id}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch post');
+    try {
+      // Lấy dữ liệu từ localStorage
+      const savedPosts = localStorage.getItem('posts');
+      if (savedPosts) {
+        const parsedPosts = JSON.parse(savedPosts);
+        const post = parsedPosts.find((p: any) => p.id === parseInt(id));
+        
+        if (post) {
+          setFormData({
+            title: post.title,
+            excerpt: post.excerpt || '',
+            content: post.content,
+            category: post.category,
+            featuredImage: post.featuredImage || '',
+            status: post.status || 'draft'
+          });
+        } else {
+          setError('Không tìm thấy bài viết');
         }
-        const post = await response.json();
-        setFormData({
-          title: post.title,
-          excerpt: post.excerpt || '',
-          content: post.content,
-          category: post.category,
-          featuredImage: post.featuredImage || '',
-          status: post.status || 'draft'
-        });
-      } catch (err) {
-        console.error('Error fetching post:', err);
-        setError('Failed to load post');
-      } finally {
-        setLoading(false);
+      } else {
+        setError('Không có dữ liệu bài viết');
       }
-    };
-
-    fetchPost();
+    } catch (err) {
+      console.error('Error fetching post:', err);
+      setError('Lỗi khi tải bài viết');
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -57,32 +61,46 @@ export default function EditPost({ params }: { params: { id: string } }) {
     setFormData(prev => ({ ...prev, featuredImage: imageUrl }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess('');
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/posts/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update post');
+      // Lấy dữ liệu từ localStorage
+      const savedPosts = localStorage.getItem('posts');
+      if (savedPosts) {
+        const parsedPosts = JSON.parse(savedPosts);
+        const postIndex = parsedPosts.findIndex((p: any) => p.id === parseInt(id));
+        
+        if (postIndex !== -1) {
+          // Tạo bài viết cập nhật
+          const updatedPost = {
+            ...parsedPosts[postIndex],
+            ...formData,
+            updatedAt: new Date().toISOString()
+          };
+          
+          // Cập nhật mảng bài viết
+          parsedPosts[postIndex] = updatedPost;
+          
+          // Lưu lại vào localStorage
+          localStorage.setItem('posts', JSON.stringify(parsedPosts));
+          
+          setSuccess('Bài viết đã được cập nhật thành công!');
+          setTimeout(() => {
+            router.push('/admin/posts');
+          }, 1000);
+        } else {
+          throw new Error('Không tìm thấy bài viết');
+        }
+      } else {
+        throw new Error('Không có dữ liệu bài viết');
       }
-
-      setSuccess('Post updated successfully!');
-      setTimeout(() => {
-        router.push('/admin/posts');
-      }, 2000);
     } catch (err) {
       console.error('Error updating post:', err);
-      setError('Failed to update post. Please try again.');
+      setError(err instanceof Error ? err.message : 'Lỗi khi cập nhật bài viết');
     } finally {
       setLoading(false);
     }
