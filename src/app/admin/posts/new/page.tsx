@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { FaSave, FaArrowLeft } from 'react-icons/fa';
 import styles from './editor.module.scss';
-import ImageUploader from '@/app/components/ui/ImageUploader';
+import CloudflareImageUploader from '@/app/components/ui/CloudflareImageUploader';
 
 // Import React Quill động để tránh lỗi SSR
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
@@ -94,14 +94,28 @@ export default function NewPostPage() {
         status
       };
 
-      // Lấy danh sách bài viết hiện có từ localStorage
-      const existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-      
-      // Thêm bài viết mới vào danh sách
-      const updatedPosts = [newPost, ...existingPosts];
-      
-      // Lưu danh sách bài viết vào localStorage
-      localStorage.setItem('posts', JSON.stringify(updatedPosts));
+      try {
+        // Gửi request đến API để lưu bài viết
+        const response = await fetch('/api/posts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPost),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Lỗi khi lưu bài viết');
+        }
+      } catch (apiError) {
+        console.error('API Error:', apiError);
+
+        // Fallback: Sử dụng localStorage nếu API không hoạt động
+        const existingPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+        const updatedPosts = [newPost, ...existingPosts];
+        localStorage.setItem('posts', JSON.stringify(updatedPosts));
+      }
 
       // Chuyển hướng đến trang danh sách bài viết
       setTimeout(() => {
@@ -122,13 +136,13 @@ export default function NewPostPage() {
   return (
     <div className={styles.editorPage}>
       <div className={styles.header}>
-        <button 
+        <button
           className={styles.backButton}
           onClick={() => router.push('/admin/posts')}
         >
           <FaArrowLeft /> Quay lại
         </button>
-        <button 
+        <button
           className={styles.saveButton}
           onClick={handleSavePost}
           disabled={isSaving}
@@ -164,7 +178,7 @@ export default function NewPostPage() {
         </div>
 
         <div className={styles.formGroup}>
-          <ImageUploader
+          <CloudflareImageUploader
             initialImage={featuredImage}
             onImageUpload={handleImageUpload}
             label="Ảnh đại diện"
