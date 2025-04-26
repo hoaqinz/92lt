@@ -23,7 +23,6 @@ export async function onRequest(context) {
   }
 
   try {
-    // Sử dụng base64 fallback thay vì Cloudflare Images API
     const formData = await context.request.formData();
     const file = formData.get("file");
 
@@ -37,18 +36,15 @@ export async function onRequest(context) {
       });
     }
 
-    // Chuyển đổi file thành base64
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
-    const base64 = btoa(String.fromCharCode.apply(null, buffer));
-    const base64Url = `data:${file.type};base64,${base64}`;
+    // Trả về thông báo thành công giả với URL giả
+    // Điều này cho phép chúng ta kiểm tra luồng làm việc mà không cần xử lý file thực sự
+    const fakeImageUrl = "https://via.placeholder.com/800x600/e60000/ffffff?text=Test+Image";
 
-    // Trả về base64 URL
     return new Response(
       JSON.stringify({
         success: true,
-        url: base64Url,
-        isBase64: true,
+        url: fakeImageUrl,
+        message: "This is a placeholder URL for testing. In production, this would be a real image URL."
       }),
       {
         headers: {
