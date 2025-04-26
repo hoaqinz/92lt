@@ -236,32 +236,50 @@ export async function uploadToCloudflare(file: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', file);
 
+    // Sử dụng Cloudflare Function API endpoint
+    const apiUrl = '/api-upload'; // Endpoint mới
+
+    console.log('Uploading to:', apiUrl);
+
     // Gửi request đến API
-    const response = await fetch('/api/upload', {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       body: formData
     });
 
     if (!response.ok) {
-      throw new Error('Lỗi khi tải lên hình ảnh');
+      const errorText = await response.text();
+      console.error(`Upload response not OK (${response.status}):`, errorText);
+      throw new Error(`Lỗi khi tải lên hình ảnh: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('Upload response:', data);
+
+    if (!data.url) {
+      console.error('No URL in response:', data);
+      throw new Error('Không nhận được URL hình ảnh');
+    }
+
     return data.url; // URL của hình ảnh đã tải lên
   } catch (error) {
     console.error('Error uploading to Cloudflare:', error);
-    
+
     // Fallback: Sử dụng base64 nếu API không hoạt động
+    console.log('Using fallback: base64 encoding');
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target && event.target.result) {
-          resolve(event.target.result.toString());
+          const result = event.target.result.toString();
+          console.log('Base64 encoding successful, length:', result.length);
+          resolve(result);
         } else {
           reject(new Error('Failed to read file'));
         }
       };
-      reader.onerror = () => {
+      reader.onerror = (event) => {
+        console.error('FileReader error:', event);
         reject(new Error('Failed to read file'));
       };
       reader.readAsDataURL(file);

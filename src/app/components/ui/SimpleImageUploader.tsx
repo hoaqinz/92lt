@@ -22,7 +22,7 @@ export default function SimpleImageUploader({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Hàm chuyển đổi file thành Base64
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -61,27 +61,52 @@ export default function SimpleImageUploader({
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
 
-      // Giả lập quá trình tải lên
-      console.log('Đang giả lập quá trình tải ảnh lên...');
+      // Tạo FormData để gửi file
+      const formData = new FormData();
+      formData.append('file', file);
+
+      console.log('Đang tải ảnh lên qua API...');
+
+      // Gửi request đến API
+      const response = await fetch('/api-upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Upload response not OK (${response.status}):`, errorText);
+        throw new Error(`Lỗi khi tải lên hình ảnh: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Upload response:', data);
       
-      // Tạo độ trễ giả lập để mô phỏng quá trình tải lên
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!data.url) {
+        console.error('No URL in response:', data);
+        throw new Error('Không nhận được URL hình ảnh');
+      }
       
-      // Chuyển đổi file thành Base64
-      const base64Url = await convertFileToBase64(file);
-      
-      // Sử dụng URL Base64 thay vì URL blob
-      onImageUpload(base64Url);
-      
-      console.log('Tải lên thành công (giả lập)!');
+      // Sử dụng URL từ API
+      onImageUpload(data.url);
+      console.log('Tải lên thành công!');
     } catch (error) {
       console.error('Error uploading image:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra khi tải ảnh lên';
-      setError(errorMessage);
-
-      // Gọi callback onError nếu được cung cấp
-      if (onError) {
-        onError(errorMessage);
+      
+      // Fallback: Sử dụng base64 nếu API không hoạt động
+      console.log('Sử dụng fallback: base64 encoding');
+      try {
+        const base64Url = await convertFileToBase64(file);
+        onImageUpload(base64Url);
+        console.log('Fallback thành công!');
+      } catch (fallbackError) {
+        const errorMessage = error instanceof Error ? error.message : 'Có lỗi xảy ra khi tải ảnh lên';
+        setError(errorMessage);
+        
+        // Gọi callback onError nếu được cung cấp
+        if (onError) {
+          onError(errorMessage);
+        }
       }
     } finally {
       setIsUploading(false);

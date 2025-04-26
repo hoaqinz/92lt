@@ -20,7 +20,7 @@ const CloudflareImageUploader = ({
   const [error, setError] = useState<string>('');
   const [uploadMode, setUploadMode] = useState<'file' | 'url'>('file');
   const [imageUrl, setImageUrl] = useState<string>(initialImage);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -47,8 +47,8 @@ const CloudflareImageUploader = ({
       const formData = new FormData();
       formData.append('file', file);
 
-      // Gửi request đến Cloudflare Images API
-      const response = await fetch('/api/upload-image', {
+      // Gửi request đến API
+      const response = await fetch('/api-upload', {
         method: 'POST',
         body: formData
       });
@@ -58,13 +58,26 @@ const CloudflareImageUploader = ({
       }
 
       const data = await response.json();
-      const imageUrl = data.result.variants[0]; // URL của hình ảnh đã tải lên
+      const imageUrl = data.url; // URL của hình ảnh đã tải lên
 
       setImage(imageUrl);
       onImageUpload(imageUrl);
     } catch (err) {
       console.error('Error uploading image:', err);
-      setError('Đã xảy ra lỗi khi tải lên hình ảnh. Vui lòng thử lại sau.');
+
+      // Fallback: Sử dụng base64 nếu API không hoạt động
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target && event.target.result) {
+          const base64String = event.target.result.toString();
+          setImage(base64String);
+          onImageUpload(base64String);
+        }
+      };
+      reader.onerror = () => {
+        setError('Đã xảy ra lỗi khi đọc file. Vui lòng thử lại sau.');
+      };
+      reader.readAsDataURL(file);
     } finally {
       setIsUploading(false);
     }
@@ -88,19 +101,19 @@ const CloudflareImageUploader = ({
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    
+
     if (uploadMode === 'url') return;
-    
+
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
-    
+
     // Tạo một sự kiện giả để sử dụng hàm handleFileChange
     const fileInputEl = fileInputRef.current;
     if (fileInputEl) {
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
       fileInputEl.files = dataTransfer.files;
-      
+
       // Kích hoạt sự kiện change
       const event = new Event('change', { bubbles: true });
       fileInputEl.dispatchEvent(event);
@@ -120,16 +133,16 @@ const CloudflareImageUploader = ({
   return (
     <div className={styles.imageUploader}>
       <label className={styles.label}>{label}</label>
-      
+
       <div className={styles.uploadModeToggle}>
-        <button 
+        <button
           type="button"
           className={`${styles.modeButton} ${uploadMode === 'file' ? styles.active : ''}`}
           onClick={() => setUploadMode('file')}
         >
           Tải lên file
         </button>
-        <button 
+        <button
           type="button"
           className={`${styles.modeButton} ${uploadMode === 'url' ? styles.active : ''}`}
           onClick={() => setUploadMode('url')}
@@ -137,9 +150,9 @@ const CloudflareImageUploader = ({
           Nhập URL
         </button>
       </div>
-      
+
       {uploadMode === 'file' ? (
-        <div 
+        <div
           className={styles.dropZone}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -152,7 +165,7 @@ const CloudflareImageUploader = ({
             accept="image/*"
             onChange={handleFileChange}
           />
-          
+
           {isUploading ? (
             <div className={styles.uploading}>
               <FaSpinner className={styles.spinner} />
@@ -182,14 +195,14 @@ const CloudflareImageUploader = ({
             placeholder="Nhập URL hình ảnh"
             className={styles.urlInput}
           />
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={handleUrlSubmit}
             className={styles.urlSubmitButton}
           >
             Áp dụng
           </button>
-          
+
           {image && (
             <div className={styles.previewContainer}>
               <img src={image} alt="Preview" className={styles.preview} />
@@ -197,7 +210,7 @@ const CloudflareImageUploader = ({
           )}
         </div>
       )}
-      
+
       {error && <div className={styles.error}>{error}</div>}
     </div>
   );
