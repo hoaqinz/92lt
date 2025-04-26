@@ -2,227 +2,257 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaPlus, FaEdit, FaTrash, FaEye, FaCalendarAlt } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash } from 'react-icons/fa';
 import styles from './posts.module.scss';
 
+// Định nghĩa kiểu dữ liệu cho bài viết
 interface Post {
-  id: string;
+  id: number;
   title: string;
+  slug: string;
+  content: string;
   excerpt: string;
-  date: string;
-  views: number;
+  featuredImage: string;
   category: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+  status: 'draft' | 'published';
 }
 
-export default function PostsList() {
+export default function PostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [postToDelete, setPostToDelete] = useState<string | null>(null);
-
-  // Dữ liệu mẫu mặc định
-  const defaultPosts = [
-    {
-      id: 'post-1',
-      title: 'Hướng dẫn cách chơi Win Go hiệu quả nhất',
-      excerpt: 'Tìm hiểu các chiến thuật và mẹo chơi Win Go để tăng cơ hội chiến thắng của bạn.',
-      date: '15/07/2023',
-      views: 1250,
-      category: 'huong-dan'
-    },
-    {
-      id: 'post-2',
-      title: 'Top 10 game Slots được yêu thích nhất tháng 7/2023',
-      excerpt: 'Khám phá những game Slots hot nhất và được người chơi yêu thích trong tháng này.',
-      date: '10/07/2023',
-      views: 980,
-      category: 'tin-tuc'
-    },
-    {
-      id: 'post-3',
-      title: 'Cách quản lý vốn hiệu quả khi chơi Casino trực tuyến',
-      excerpt: 'Những bí quyết giúp bạn quản lý vốn một cách thông minh và hiệu quả khi chơi Casino.',
-      date: '05/07/2023',
-      views: 820,
-      category: 'meo-hay'
-    },
-    {
-      id: 'post-4',
-      title: 'Những sai lầm phổ biến khi chơi Bắn Cá và cách tránh',
-      excerpt: 'Tránh những sai lầm này để nâng cao kỹ năng và tăng cơ hội chiến thắng khi chơi Bắn Cá.',
-      date: '01/07/2023',
-      views: 750,
-      category: 'meo-hay'
-    }
-  ];
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
 
   // Đánh dấu khi component được mount ở client-side
   useEffect(() => {
     setIsClient(true);
-    setPosts(defaultPosts); // Khởi tạo với dữ liệu mẫu
-    setLoading(false);
   }, []);
 
-  // Lấy dữ liệu từ localStorage khi ở client-side
+  // Lấy danh sách bài viết từ API hoặc localStorage
   useEffect(() => {
     if (!isClient) return;
 
-    try {
-      // Lấy dữ liệu từ localStorage
-      const storedPosts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+    const fetchPosts = async () => {
+      try {
+        setIsLoading(true);
 
-      if (storedPosts.length > 0) {
-        // Nếu có dữ liệu trong localStorage, sử dụng nó
-        setPosts(storedPosts);
-      } else {
-        // Nếu không có dữ liệu trong localStorage, lưu dữ liệu mẫu
-        localStorage.setItem('blogPosts', JSON.stringify(defaultPosts));
+        // Thử lấy dữ liệu từ API
+        try {
+          const response = await fetch('/api/posts');
+
+          if (response.ok) {
+            const data = await response.json();
+            setPosts(data);
+            return;
+          }
+        } catch (apiError) {
+          console.error('API Error:', apiError);
+        }
+
+        // Fallback: Sử dụng localStorage nếu API không hoạt động
+        const savedPosts = localStorage.getItem('posts');
+        if (savedPosts) {
+          const parsedPosts = JSON.parse(savedPosts);
+          setPosts(parsedPosts);
+        }
+      } catch (err) {
+        console.error('Error loading posts:', err);
+        setError(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi tải bài viết');
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      console.error('Error loading posts:', err);
-      setError('Đã xảy ra lỗi khi tải danh sách bài viết');
-    }
+    };
+
+    fetchPosts();
   }, [isClient]);
 
-  const handleDeleteClick = (postId: string) => {
-    setPostToDelete(postId);
-    setShowDeleteModal(true);
-  };
+  // Xóa bài viết
+  const handleDeletePost = async (id: number) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa bài viết này?')) {
+      return;
+    }
 
-  const confirmDelete = () => {
-    if (postToDelete && isClient) {
+    try {
+      // Thử xóa bài viết qua API
       try {
-        // Lấy dữ liệu từ localStorage
-        const storedPosts = JSON.parse(localStorage.getItem('blogPosts') || '[]');
+        const response = await fetch(`/api/posts-by-id/${id}`, {
+          method: 'DELETE',
+        });
 
-        // Lọc bỏ bài viết cần xóa
-        const updatedPosts = storedPosts.filter((post: any) => post.id !== postToDelete);
-
-        // Lưu lại vào localStorage
-        localStorage.setItem('blogPosts', JSON.stringify(updatedPosts));
-
-        // Cập nhật state
-        setPosts(posts.filter(post => post.id !== postToDelete));
-
-        // Đóng modal
-        setShowDeleteModal(false);
-        setPostToDelete(null);
-      } catch (err) {
-        console.error('Error deleting post:', err);
-        setError('Đã xảy ra lỗi khi xóa bài viết');
+        if (response.ok) {
+          // Cập nhật state
+          setPosts(posts.filter(post => post.id !== id));
+          return;
+        }
+      } catch (apiError) {
+        console.error('API Error:', apiError);
       }
-    } else {
-      // Nếu chưa ở client-side, chỉ cập nhật state
-      setPosts(posts.filter(post => post.id !== postToDelete));
-      setShowDeleteModal(false);
-      setPostToDelete(null);
+
+      // Fallback: Sử dụng localStorage nếu API không hoạt động
+      const savedPosts = localStorage.getItem('posts');
+      if (savedPosts) {
+        const parsedPosts = JSON.parse(savedPosts);
+        // Lọc bỏ bài viết cần xóa
+        const updatedPosts = parsedPosts.filter((post: Post) => post.id !== id);
+        // Lưu lại vào localStorage
+        localStorage.setItem('posts', JSON.stringify(updatedPosts));
+        // Cập nhật state
+        setPosts(updatedPosts);
+      }
+    } catch (err) {
+      console.error('Error deleting post:', err);
+      alert(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi xóa bài viết');
     }
   };
 
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setPostToDelete(null);
+  // Thay đổi trạng thái bài viết
+  const handleToggleStatus = async (post: Post) => {
+    try {
+      const updatedPost = {
+        ...post,
+        status: post.status === 'published' ? 'draft' : 'published',
+      };
+
+      // Thử cập nhật bài viết qua API
+      try {
+        const response = await fetch(`/api/posts-by-id/${post.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedPost),
+        });
+
+        if (response.ok) {
+          // Cập nhật state
+          setPosts(posts.map(p => p.id === post.id ? updatedPost : p));
+          return;
+        }
+      } catch (apiError) {
+        console.error('API Error:', apiError);
+      }
+
+      // Fallback: Sử dụng localStorage nếu API không hoạt động
+      const savedPosts = localStorage.getItem('posts');
+      if (savedPosts) {
+        const parsedPosts = JSON.parse(savedPosts);
+        // Cập nhật bài viết
+        const updatedPosts = parsedPosts.map((p: Post) =>
+          p.id === post.id ? updatedPost : p
+        );
+        // Lưu lại vào localStorage
+        localStorage.setItem('posts', JSON.stringify(updatedPosts));
+        // Cập nhật state
+        setPosts(updatedPosts);
+      }
+    } catch (err) {
+      console.error('Error updating post status:', err);
+      alert(err instanceof Error ? err.message : 'Đã xảy ra lỗi khi cập nhật trạng thái bài viết');
+    }
   };
 
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className="spinner"></div>
-        <p>Đang tải danh sách bài viết...</p>
-      </div>
-    );
-  }
+  // Format ngày tháng
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).format(date);
+  };
 
-  if (error) {
-    return (
-      <div className="admin-alert error">
-        <p>{error}</p>
-      </div>
-    );
+  if (!isClient) {
+    return <div>Loading...</div>;
   }
 
   return (
     <div className={styles.postsContainer}>
-      <div className={styles.postsHeader}>
-        <h3>Danh sách bài viết</h3>
-        <Link href="/admin/posts/new" className="admin-btn primary">
+      <div className={styles.header}>
+        <h1>Quản lý bài viết</h1>
+        <Link href="/admin/posts/new" className={styles.addButton}>
           <FaPlus /> Thêm bài viết mới
         </Link>
       </div>
 
-      {posts.length === 0 ? (
-        <div className="admin-alert info">
-          <p>Chưa có bài viết nào. Hãy thêm bài viết mới!</p>
+      {error && <div className={styles.error}>{error}</div>}
+
+      {isLoading ? (
+        <div className={styles.loading}>Đang tải...</div>
+      ) : posts.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p>Chưa có bài viết nào. Hãy thêm bài viết mới.</p>
         </div>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Tiêu đề</th>
-              <th>Danh mục</th>
-              <th>Ngày đăng</th>
-              <th>Lượt xem</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {posts.map((post) => (
-              <tr key={post.id}>
-                <td className={styles.titleCell}>
-                  <div className={styles.postTitle}>{post.title}</div>
-                  <div className={styles.postExcerpt}>{post.excerpt}</div>
-                </td>
-                <td>{post.category === 'huong-dan' ? 'Hướng dẫn' :
-                     post.category === 'tin-tuc' ? 'Tin tức' :
-                     post.category === 'meo-hay' ? 'Mẹo hay' :
-                     post.category === 'khuyen-mai' ? 'Khuyến mãi' : post.category}</td>
-                <td>
-                  <span className={styles.dateCell}>
-                    <FaCalendarAlt /> {post.date}
-                  </span>
-                </td>
-                <td>
-                  <span className={styles.viewsCell}>
-                    <FaEye /> {post.views}
-                  </span>
-                </td>
-                <td>
-                  <div className={styles.actions}>
-                    <Link href={`/admin/posts/edit/${post.id}`} className={styles.editButton}>
-                      <FaEdit /> Sửa
-                    </Link>
-                    <button
-                      className={styles.deleteButton}
-                      onClick={() => handleDeleteClick(post.id)}
-                    >
-                      <FaTrash /> Xóa
-                    </button>
-                  </div>
-                </td>
+        <div className={styles.postsTable}>
+          <table>
+            <thead>
+              <tr>
+                <th>Tiêu đề</th>
+                <th>Danh mục</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {/* Modal xác nhận xóa */}
-      {showDeleteModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <h3>Xác nhận xóa</h3>
-            <p>Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.</p>
-            <div className={styles.modalActions}>
-              <button className="admin-btn secondary" onClick={cancelDelete}>
-                Hủy bỏ
-              </button>
-              <button className="admin-btn danger" onClick={confirmDelete}>
-                Xóa bài viết
-              </button>
-            </div>
-          </div>
+            </thead>
+            <tbody>
+              {posts.map(post => (
+                <tr key={post.id}>
+                  <td className={styles.postTitle}>
+                    <div className={styles.titleWithImage}>
+                      {post.featuredImage && (
+                        <img
+                          src={post.featuredImage}
+                          alt={post.title}
+                          className={styles.thumbnail}
+                        />
+                      )}
+                      <div>
+                        <Link href={`/admin/posts/edit/${post.id}`}>
+                          {post.title}
+                        </Link>
+                        <div className={styles.excerpt}>{post.excerpt}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{post.category}</td>
+                  <td>{formatDate(post.createdAt)}</td>
+                  <td>
+                    <span className={`${styles.status} ${styles[post.status]}`}>
+                      {post.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className={styles.actions}>
+                      <button
+                        className={styles.actionButton}
+                        onClick={() => handleToggleStatus(post)}
+                        title={post.status === 'published' ? 'Chuyển sang bản nháp' : 'Xuất bản'}
+                      >
+                        {post.status === 'published' ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                      <Link
+                        href={`/admin/posts/edit/${post.id}`}
+                        className={styles.actionButton}
+                        title="Chỉnh sửa"
+                      >
+                        <FaEdit />
+                      </Link>
+                      <button
+                        className={styles.actionButton}
+                        onClick={() => handleDeletePost(post.id)}
+                        title="Xóa"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
