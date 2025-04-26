@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSlug } from '@/app/utils/helpers';
 
+export const dynamic = 'force-static';
+
 // GET /api/posts - Lấy tất cả bài viết
 export async function GET() {
   try {
