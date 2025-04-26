@@ -61,37 +61,13 @@ export async function onRequest(context) {
       );
     }
 
-    // Lấy biến môi trường
-    const accountId = context.env.CLOUDFLARE_ACCOUNT_ID;
-    const apiToken = context.env.CLOUDFLARE_API_TOKEN;
-    const accountHash = context.env.CLOUDFLARE_ACCOUNT_HASH;
+    // Sử dụng giá trị cố định thay vì biến môi trường
+    const accountId = "04725e5acc15b760fb22bf197ff9799f";
+    const apiToken = "JZYoQdkbYec97Na325HqQwEJAUn12Wh_tw6iUtPp";
+    const accountHash = "tJAHQehMkQM0pKlceH1PGg";
 
-    // Debug: In ra các biến môi trường (không bao gồm giá trị thực của API token)
-    console.log("Environment variables:", {
-      CLOUDFLARE_ACCOUNT_ID: accountId || "missing",
-      CLOUDFLARE_API_TOKEN: apiToken ? "present" : "missing",
-      CLOUDFLARE_ACCOUNT_HASH: accountHash || "missing",
-    });
-
-    if (!accountId || !apiToken || !accountHash) {
-      return new Response(
-        JSON.stringify({ 
-          error: "Missing Cloudflare credentials",
-          details: {
-            CLOUDFLARE_ACCOUNT_ID: accountId ? "present" : "missing",
-            CLOUDFLARE_API_TOKEN: apiToken ? "present" : "missing",
-            CLOUDFLARE_ACCOUNT_HASH: accountHash ? "present" : "missing",
-          }
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      );
-    }
+    // Debug: In ra các biến môi trường từ context
+    console.log("Environment from context:", context.env);
 
     // Tạo FormData mới để gửi đến Cloudflare Images API
     const cloudflareFormData = new FormData();
