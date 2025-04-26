@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://92lottery.dev/sitemap.xml
