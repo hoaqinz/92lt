@@ -1,0 +1,30 @@
+# Cấu hình Cloudflare Worker
+name = "92lottery-api"
+compatibility_date = "2023-10-30"
+compatibility_flags = ["nodejs_compat"]
+main = "src/worker/index.ts"
+
+# Cấu hình biến môi trường
+[vars]
+CLOUDFLARE_ACCOUNT_ID = "04725e5acc15b760fb22bf197ff9799f"
+CLOUDFLARE_ACCOUNT_HASH = "tJAHQehMkQM0pKlceH1PGg"
+CLOUDFLARE_IMAGE_DELIVERY_URL = "https://imagedelivery.net/tJAHQehMkQM0pKlceH1PGg"
+
+# Cấu hình bí mật
+# CLOUDFLARE_API_TOKEN được thiết lập trong Cloudflare dashboard
+
+# Cấu hình Routes
+routes = [
+  { pattern = "api.92lottery.dev/*", zone_name = "92lottery.dev" }
+]
+
+# Cấu hình D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "lottery92_db"
+database_id = "3c26864a-5cbb-43c9-8b16-5730721c3dd3"
+
+# Cấu hình R2 Storage
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "lottery92-storage"
