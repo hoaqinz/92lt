@@ -66,9 +66,23 @@ export async function onRequest(context) {
     const apiToken = context.env.CLOUDFLARE_API_TOKEN;
     const accountHash = context.env.CLOUDFLARE_ACCOUNT_HASH;
 
+    // Debug: In ra các biến môi trường (không bao gồm giá trị thực của API token)
+    console.log("Environment variables:", {
+      CLOUDFLARE_ACCOUNT_ID: accountId || "missing",
+      CLOUDFLARE_API_TOKEN: apiToken ? "present" : "missing",
+      CLOUDFLARE_ACCOUNT_HASH: accountHash || "missing",
+    });
+
     if (!accountId || !apiToken || !accountHash) {
       return new Response(
-        JSON.stringify({ error: "Missing Cloudflare credentials" }),
+        JSON.stringify({ 
+          error: "Missing Cloudflare credentials",
+          details: {
+            CLOUDFLARE_ACCOUNT_ID: accountId ? "present" : "missing",
+            CLOUDFLARE_API_TOKEN: apiToken ? "present" : "missing",
+            CLOUDFLARE_ACCOUNT_HASH: accountHash ? "present" : "missing",
+          }
+        }),
         {
           status: 500,
           headers: {
@@ -100,7 +114,10 @@ export async function onRequest(context) {
       const errorData = await response.json();
       console.error("Cloudflare Images API error:", errorData);
       return new Response(
-        JSON.stringify({ error: "Failed to upload to Cloudflare Images" }),
+        JSON.stringify({ 
+          error: "Failed to upload to Cloudflare Images",
+          details: errorData
+        }),
         {
           status: 500,
           headers: {
@@ -132,7 +149,10 @@ export async function onRequest(context) {
   } catch (error) {
     console.error("Error uploading image:", error);
 
-    return new Response(JSON.stringify({ error: "Failed to upload image" }), {
+    return new Response(JSON.stringify({ 
+      error: "Failed to upload image",
+      message: error.message || "Unknown error"
+    }), {
       status: 500,
       headers: {
         "Content-Type": "application/json",
