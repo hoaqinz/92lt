@@ -1,28 +1,17 @@
-# Cấu hình Cloudflare Pages
-name = "92lt"
-compatibility_date = "2023-10-30"
-compatibility_flags = ["nodejs_compat"]
+name = "92lottery-api"
+main = "src/worker/index.ts"
+compatibility_date = "2024-04-25"
 
-# Cấu hình biến môi trường
-[vars]
-CLOUDFLARE_ACCOUNT_ID = "04725e5acc15b760fb22bf197ff9799f"
-CLOUDFLARE_ACCOUNT_HASH = "tJAHQehMkQM0pKlceH1PGg"
-CLOUDFLARE_IMAGE_DELIVERY_URL = "https://imagedelivery.net/tJAHQehMkQM0pKlceH1PGg"
-# CLOUDFLARE_API_TOKEN được thiết lập trong Cloudflare dashboard
+# Production configuration
+[env.production]
+workers_dev = true
+route = "api.92lottery.dev/*"
 
-# Cấu hình Functions
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "lottery92_db"
+database_id = "3c26864a-5cbb-43c9-8b16-5730721c3dd3"
+
+# Static assets configuration
 [site]
 bucket = "./out"
-
-[build]
-command = "npm run build"
-
-# Cấu hình Routes
-[[routes]]
-pattern = "/api/upload"
-script = "api/upload.js"
-
-# API route đã được xóa vì không tương thích với static export
-# [[routes]]
-# pattern = "/api/get-upload-url"
-# script = "api/get-upload-url.js"
