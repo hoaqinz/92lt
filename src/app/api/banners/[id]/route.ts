@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-static';
 
+// Hàm này cần thiết cho static export với dynamic routes
+export function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+  ];
+}
+
 // Định nghĩa kiểu dữ liệu cho banner
 interface Banner {
   id: number;
