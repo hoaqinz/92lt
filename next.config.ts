@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   output: 'export',
   images: {
     unoptimized: true,
+    domains: ['imagedelivery.net'], // Cho phép ảnh từ Cloudflare Images
   },
   trailingSlash: true,
   eslint: {

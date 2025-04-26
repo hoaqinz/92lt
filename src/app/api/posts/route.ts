@@ -1,62 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { createSlug } from '@/app/utils/helpers';
 
-export const dynamic = 'force-static';
-
-// Định nghĩa kiểu dữ liệu cho bài viết
-interface Post {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string;
-  featuredImage: string;
-  category: string;
-  author: string;
-  createdAt: string;
-  updatedAt: string;
-  status: 'draft' | 'published';
-}
-
-// Đường dẫn đến file JSON lưu trữ dữ liệu
-const dataFilePath = path.join(process.cwd(), 'data', 'posts.json');
-
-// Đảm bảo thư mục data tồn tại
-const ensureDataDirectoryExists = () => {
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-};
-
-// Đọc dữ liệu từ file
-const readPostsData = (): Post[] => {
-  ensureDataDirectoryExists();
-  
-  if (!fs.existsSync(dataFilePath)) {
-    // Nếu file không tồn tại, tạo file mới với mảng rỗng
-    fs.writeFileSync(dataFilePath, JSON.stringify([]));
-    return [];
-  }
-  
-  const data = fs.readFileSync(dataFilePath, 'utf8');
-  return JSON.parse(data);
-};
-
-// Ghi dữ liệu vào file
-const writePostsData = (data: Post[]) => {
-  ensureDataDirectoryExists();
-  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-};
-
-// API endpoint để lấy tất cả bài viết
+// GET /api/posts - Lấy tất cả bài viết
 export async function GET() {
   try {
-    const posts = readPostsData();
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch posts');
+    }
+
+    const posts = await response.json();
     return NextResponse.json(posts);
   } catch (error) {
-    console.error('Error reading posts:', error);
+    console.error('Error fetching posts:', error);
     return NextResponse.json(
       { error: 'Failed to fetch posts' },
       { status: 500 }
@@ -64,37 +21,44 @@ export async function GET() {
   }
 }
 
-// API endpoint để tạo bài viết mới
+// POST /api/posts - Tạo bài viết mới
 export async function POST(request: NextRequest) {
   try {
-    const newPost = await request.json();
-    
-    // Kiểm tra dữ liệu đầu vào
-    if (!newPost.title || !newPost.content) {
+    const data = await request.json();
+    const { title, content, category } = data;
+
+    if (!title || !content || !category) {
       return NextResponse.json(
-        { error: 'Title and content are required' },
+        { error: 'Title, content and category are required' },
         { status: 400 }
       );
     }
+
+    // Tạo slug từ title
+    const slug = createSlug(title);
     
-    // Đọc dữ liệu hiện tại
-    const posts = readPostsData();
-    
-    // Thêm ID và timestamp nếu chưa có
-    if (!newPost.id) {
-      newPost.id = Date.now();
+    // Thêm các trường tự động
+    const post = {
+      ...data,
+      slug,
+      author: 'Admin', // TODO: Lấy từ session
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(post),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create post');
     }
-    if (!newPost.createdAt) {
-      newPost.createdAt = new Date().toISOString();
-    }
-    newPost.updatedAt = new Date().toISOString();
-    
-    // Thêm bài viết mới vào đầu mảng
-    const updatedPosts = [newPost, ...posts];
-    
-    // Lưu dữ liệu
-    writePostsData(updatedPosts);
-    
+
+    const newPost = await response.json();
     return NextResponse.json(newPost, { status: 201 });
   } catch (error) {
     console.error('Error creating post:', error);
@@ -105,41 +69,38 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// API endpoint để cập nhật bài viết
+// PUT /api/posts/[id] - Cập nhật bài viết
 export async function PUT(request: NextRequest) {
   try {
-    const updatedPost = await request.json();
-    
-    // Kiểm tra dữ liệu đầu vào
-    if (!updatedPost.id) {
+    const data = await request.json();
+    const { id } = data;
+
+    if (!id) {
       return NextResponse.json(
         { error: 'Post ID is required' },
         { status: 400 }
       );
     }
-    
-    // Đọc dữ liệu hiện tại
-    const posts = readPostsData();
-    
-    // Tìm và cập nhật bài viết
-    const postIndex = posts.findIndex(post => post.id === updatedPost.id);
-    
-    if (postIndex === -1) {
-      return NextResponse.json(
-        { error: 'Post not found' },
-        { status: 404 }
-      );
-    }
-    
+
     // Cập nhật thời gian
-    updatedPost.updatedAt = new Date().toISOString();
-    
-    // Cập nhật bài viết
-    posts[postIndex] = updatedPost;
-    
-    // Lưu dữ liệu
-    writePostsData(posts);
-    
+    const post = {
+      ...data,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(post),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update post');
+    }
+
+    const updatedPost = await response.json();
     return NextResponse.json(updatedPost);
   } catch (error) {
     console.error('Error updating post:', error);
@@ -150,36 +111,27 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// API endpoint để xóa bài viết
+// DELETE /api/posts/[id] - Xóa bài viết
 export async function DELETE(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    
+    // Lấy ID từ URL
+    const id = request.url.split('/').pop();
+
     if (!id) {
       return NextResponse.json(
         { error: 'Post ID is required' },
         { status: 400 }
       );
     }
-    
-    // Đọc dữ liệu hiện tại
-    const posts = readPostsData();
-    
-    // Lọc bỏ bài viết cần xóa
-    const updatedPosts = posts.filter(post => post.id !== Number(id));
-    
-    // Kiểm tra xem có bài viết nào bị xóa không
-    if (updatedPosts.length === posts.length) {
-      return NextResponse.json(
-        { error: 'Post not found' },
-        { status: 404 }
-      );
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/posts/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete post');
     }
-    
-    // Lưu dữ liệu
-    writePostsData(updatedPosts);
-    
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting post:', error);

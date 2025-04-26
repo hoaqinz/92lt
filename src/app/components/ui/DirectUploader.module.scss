@@ -1,0 +1,51 @@
+.uploader {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.uploadButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #aaa;
+
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  input {
+    display: none;
+  }
+
+  svg {
+    font-size: 1.5rem;
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+.error {
+  color: #ff4444;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
