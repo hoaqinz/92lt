@@ -203,86 +203,68 @@ export const PromotionsAPI = {
   },
 };
 
-const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
-const IMAGE_DELIVERY_URL = `https://imagedelivery.net/${CLOUDFLARE_ACCOUNT_ID}`;
-
-// Get direct upload URL from Cloudflare Images
-export async function getUploadUrl() {
-  try {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v2/direct_upload`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to get upload URL');
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error getting upload URL:', error);
-    throw error;
-  }
-}
-
-// Upload file directly to Cloudflare Images
-export async function uploadImage(file: File) {
-  try {
-    // Get upload URL
-    const { result } = await getUploadUrl();
-    const { uploadURL } = result;
-
-    // Upload file
+// API Upload
+export const UploadAPI = {
+  // Tải lên file
+  uploadFile: async (file: File): Promise<{ success: boolean; url: string }> => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const uploadResponse = await fetch(uploadURL, {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Upload failed');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Upload Error:', error);
+      throw error;
+    }
+  },
+};
+
+// Hàm tải ảnh lên Cloudflare Images
+export async function uploadToCloudflare(file: File): Promise<string> {
+  try {
+    // Tạo FormData để gửi file
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Gửi request đến API
+    const response = await fetch('/api/upload', {
       method: 'POST',
       body: formData
     });
 
-    if (!uploadResponse.ok) {
-      throw new Error('Failed to upload image');
-    }
-
-    const uploadResult = await uploadResponse.json();
-    return {
-      success: true,
-      imageUrl: `${IMAGE_DELIVERY_URL}/${uploadResult.result.id}/public`
-    };
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    throw error;
-  }
-}
-
-// Delete image from Cloudflare Images
-export async function deleteImage(imageId: string) {
-  try {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/images/v1/${imageId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${CLOUDFLARE_API_TOKEN}`,
-        }
-      }
-    );
-
     if (!response.ok) {
-      throw new Error('Failed to delete image');
+      throw new Error('Lỗi khi tải lên hình ảnh');
     }
 
-    return { success: true };
+    const data = await response.json();
+    return data.url; // URL của hình ảnh đã tải lên
   } catch (error) {
-    console.error('Error deleting image:', error);
-    throw error;
+    console.error('Error uploading to Cloudflare:', error);
+    
+    // Fallback: Sử dụng base64 nếu API không hoạt động
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target && event.target.result) {
+          resolve(event.target.result.toString());
+        } else {
+          reject(new Error('Failed to read file'));
+        }
+      };
+      reader.onerror = () => {
+        reject(new Error('Failed to read file'));
+      };
+      reader.readAsDataURL(file);
+    });
   }
-}
+};
