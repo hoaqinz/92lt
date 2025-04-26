@@ -37,8 +37,8 @@ export async function onRequest(context) {
     }
 
     // Trả về thông báo thành công giả với URL giả
-    // Điều này cho phép chúng ta kiểm tra luồng làm việc mà không cần xử lý file thực sự
-    const fakeImageUrl = "https://via.placeholder.com/800x600/e60000/ffffff?text=Test+Image";
+    // Sử dụng URL từ dummyimage.com thay vì via.placeholder.com
+    const fakeImageUrl = "https://dummyimage.com/800x600/e60000/ffffff.png&text=Test+Image";
 
     return new Response(
       JSON.stringify({
