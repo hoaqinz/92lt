@@ -5,6 +5,26 @@ import Link from 'next/link';
 import { PostsAPI } from '@/app/api/cloudflare';
 import styles from './post.module.scss';
 
+// Hàm này cần thiết cho static export với dynamic routes
+export function generateStaticParams() {
+  // Trong môi trường static export, chúng ta cần cung cấp danh sách các slug cố định
+  return [
+    { slug: 'huong-dan-choi-win-go' },
+    { slug: 'top-10-game-slots' },
+    { slug: 'bai-viet-1' },
+    { slug: 'bai-viet-2' },
+    { slug: 'bai-viet-3' },
+    { slug: 'bai-viet-4' },
+    { slug: 'bai-viet-5' },
+    { slug: 'bai-viet-moi-nhat' },
+    { slug: 'huong-dan-su-dung' },
+    { slug: 'gioi-thieu' },
+    { slug: 'lien-he' },
+    { slug: 'chinh-sach-bao-mat' },
+    { slug: 'dieu-khoan-su-dung' },
+  ];
+}
+
 // Định nghĩa kiểu dữ liệu cho bài viết
 interface Post {
   id: number;
