@@ -8,8 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "cloudflare-build": "npm install --force --legacy-peer-deps && NEXT_DISABLE_ESLINT=1 NEXT_DISABLE_DYNAMIC_ROUTE_VALIDATION=1 NEXT_MISSING_SUSPENSE_WITH_CSR_BAILOUT=1 next build",
-    "db:init": "npx wrangler d1 execute lottery92_db --local --file=./src/worker/schema.sql",
-    "worker:dev": "npx wrangler dev src/worker/index.ts"
+    "db:init": "wrangler d1 execute lottery92_db --local --file=./src/worker/schema.sql",
+    "worker:dev": "wrangler dev src/worker/index.ts",
+    "worker:deploy": "wrangler deploy src/worker/index.ts",
+    "deploy": "npm run build && npm run worker:deploy"
   },
   "dependencies": {
     "itty-router": "^5.0.18",
@@ -22,12 +24,16 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240320.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^10.0.0",
+    "autoprefixer": "^10.4.21",
     "eslint": "^8",
     "eslint-config-next": "15.3.1",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4",
     "typescript": "^5",
     "wrangler": "^3.37.0"
   }
