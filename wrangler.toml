@@ -1,17 +1,30 @@
-name = "92lottery-api"
-main = "src/worker/index.ts"
-compatibility_date = "2024-04-25"
+# Cấu hình Cloudflare Pages
+name = "92lt"
+compatibility_date = "2023-10-30"
+compatibility_flags = ["nodejs_compat"]
 
-# Production configuration
-[env.production]
-workers_dev = true
-route = "api.92lottery.dev/*"
+# Cấu hình biến môi trường
+[vars]
+CLOUDFLARE_ACCOUNT_ID = "04725e5acc15b760fb22bf197ff9799f"
+CLOUDFLARE_ACCOUNT_HASH = "tJAHQehMkQM0pKlceH1PGg"
+CLOUDFLARE_IMAGE_DELIVERY_URL = "https://imagedelivery.net/tJAHQehMkQM0pKlceH1PGg"
+NEXT_PUBLIC_API_URL = "https://api.92lottery.dev"
 
-[[env.production.d1_databases]]
-binding = "DB"
-database_name = "lottery92_db"
-database_id = "3c26864a-5cbb-43c9-8b16-5730721c3dd3"
+# Cấu hình bí mật
+# CLOUDFLARE_API_TOKEN được thiết lập trong Cloudflare dashboard
 
-# Static assets configuration
+# Cấu hình Pages
 [site]
 bucket = "./out"
+
+[build]
+command = "npm run build"
+output_directory = "out"
+
+# Cấu hình Pages build output
+pages_build_output_dir = "out"
+
+# Cấu hình Routes
+[[routes]]
+pattern = "/api/direct-upload"
+script = "api/direct-upload/index.js"
