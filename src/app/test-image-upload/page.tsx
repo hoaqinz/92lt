@@ -37,10 +37,10 @@ export default function TestImageUpload() {
       const formData = new FormData();
       formData.append('file', file);
 
-      addLog(`Sending POST request to /api/upload`);
+      addLog(`Sending POST request to /api-upload`);
       
       // Gửi request trực tiếp đến API
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api-upload', {
         method: 'POST',
         body: formData
       });
